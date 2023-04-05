@@ -1,6 +1,6 @@
 // enum for roles
 
-export enum Roles {
+export enum Functions {
   ADMIN = "admin",
   AANKOPER = "aankoper",
 }
