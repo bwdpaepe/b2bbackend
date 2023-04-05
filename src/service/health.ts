@@ -12,7 +12,7 @@ const debugLog = (message: any, meta = { }) => {
  */
 const ping = async () => {
   debugLog("GET health ping");
-  return Promise.resolve({ pong: true });
+  return "pong";
 };
 
 /**
@@ -20,11 +20,11 @@ const ping = async () => {
  */
 const getVersion = async () => {
   debugLog("GET health service");
-  return Promise.resolve({
+  return {
     env: process.env.NODE_ENV,
     version: packageJson.version,
     name: packageJson.name,
-  });
+  };
 };
 
 export default {
