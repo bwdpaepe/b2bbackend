@@ -4,8 +4,6 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 //import bcrypt from "bcrypt";
 import authService from "./auth";
-import config from "../../config/config";
-import { Functions } from "../enums/Functions";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -28,7 +26,11 @@ const checkUserEndpoint = async () => {
  */
 const getAllUsers = async () => {
   debugLog("GET list of all users");
-  return await usersRepository.find();
+  return await usersRepository.find({
+    relations: {
+      bedrijf: true,
+    }
+  });
 };
 
 /**
@@ -37,7 +39,12 @@ const getAllUsers = async () => {
 const getUserById = async (userId: any) => {
   debugLog("GET user with userId " + userId);
   try {
-    const user = await usersRepository.findOneBy({ userId: Number(userId) });
+    const user = await usersRepository.findOne({
+      where: { userId: Number(userId)},
+      relations: {
+        bedrijf: true,
+      }
+    });
     return user;
   } catch (error) {
     debugLog("User with userId " + userId + " doesn't exist");
@@ -93,6 +100,7 @@ const getUserByEmailIncludingHashedPW = async (ctx: any) => {
   const userToCheck: string = ctx.query.email;
   const user = await usersRepository
     .createQueryBuilder("user")
+    .leftJoinAndSelect("user.bedrijf", "bedrijf")  // om bedrijf waaraan user gelinkt is meteen mee te krijgen
     .where("user.email = :email", { email: userToCheck })
     .addSelect("user.passwordHashed") // Nodig om de gehide column passwordHashed ook op te halen !
     .getOne(); // Altijd max 1, want userName heeft Unique constraint in database
