@@ -75,13 +75,12 @@ const checkAndParseSession = async (authHeader: any) => {
     )) as object;
 
     const values = Object.values(decodedToken);
-    const [username, userId, roles, status, ...rest] = values;
+    const [email, userId, _function, ...rest] = values;  //_function want function is een reserved keyword
 
     return {
-      username,
-      userId,
-      roles,
-      status,
+      email: email as string,
+      userId: userId as number,
+      function: _function as string,
       authToken,
     };
   } catch (error) {

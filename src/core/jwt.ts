@@ -7,7 +7,7 @@ const JWT_SECRET = config.auth.jwt.secret;
 const JWT_ISSUER = config.auth.jwt.issuer;
 const JWT_EXPIRATION_INTERVAL = config.auth.jwt.expirationInterval;
 
-const generateJWT = (user: { email: any; userId: any; function: any }) => {
+const generateJWT = (user: { email: string; userId: number; function: string }) => {
   const tokenData = {
     email: user.email,
     userId: user.userId,
