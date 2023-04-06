@@ -12,8 +12,8 @@ import {
 
 
 // TODO - relaties met andere entiteiten toevoegen 
-
-@Entity({ name: "gebruikers" }) //  User entity will be mapped to the 'gebruikers' table in the MySQL database
+// OPLETTEN: table names zijn hoofdlettergevoelig in MySQL !!! Goed kijken naar exacte naam van de tabel in de remote DB (vichogent server)
+@Entity({ name: "Gebruikers" }) //  User entity will be mapped to the 'Gebruikers' table in the MySQL database
 export class User {
   @PrimaryGeneratedColumn({ name: "ID" })
   userId: number;
