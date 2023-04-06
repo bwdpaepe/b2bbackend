@@ -28,7 +28,7 @@ const getAllUsers = async () => {
   debugLog("GET list of all users");
   return await usersRepository.find({
     relations: {
-      bedrijf: true,
+      bedrijf: false,  // deze op true zetten als je ook de bedrijf-gegevens wilt ophalen
     }
   });
 };
