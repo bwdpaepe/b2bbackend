@@ -4,7 +4,6 @@ import { logger } from "./server";
 import config from "../config/config";
 import { User } from "./entity/User";
 
-
 export const AppDataSource = new DataSource({
   type: "mysql",
   host: config.database.host,

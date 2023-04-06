@@ -16,11 +16,9 @@ const getAllUsers = async (ctx: Koa.Context) => {
 };
 
 // GET user via JWT token
-/** Endpoint die niet nodig is voor huidige app, eventueel nuttig voor later 
 export const getUserViaJwtToken = async (ctx: Koa.Context) => {
   ctx.body = await usersService.getUserViaJwtToken(ctx);
 };
-*/
 
 // GET user by email
 export const getUserByEmail = async (ctx: Koa.Context) => {
@@ -61,18 +59,15 @@ export default function installUsersRoutes(app: any) {
     getAllUsers
   );
 
-  // GET user via JWT token - Allowed for Admin and User
-  /** Endpoint die niet nodig is voor huidige app, eventueel nuttig voor later 
+  // GET user via JWT token
     router.get(
       "/currentuser",
       authService.requireAuthentication,
-      requireAdminOrUser,
       getUserViaJwtToken
     );
-    */
-
-  // Post find user by username
-  router.post(
+    
+  // GET find user by username
+  router.get(
     "/find",
     // authService.requireAuthentication,
     // authService.checkRolePermission(Roles.USERADMIN),

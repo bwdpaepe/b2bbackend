@@ -10,6 +10,9 @@ import {
   // ManyToMany,
 } from "typeorm";
 
+
+// TODO - relaties met andere entiteiten toevoegen 
+
 @Entity({ name: "gebruikers" }) //  User entity will be mapped to the 'gebruikers' table in the MySQL database
 export class User {
   @PrimaryGeneratedColumn({ name: "ID" })
@@ -22,12 +25,21 @@ export class User {
   })
   email: string;
 
+  @Column({ name: "personeelsNr" })
+  personeelsNr: string;
+
   @Column({
-    name: "Hashed_password",
+    name: "Hashed_paswoord",
     length: 255,
     select: false, // Deze kolom hiden, zodat niet automatisch gereturned bij ophalen van user uit DB
   })
   passwordHashed: string;
+
+  @Column({ name: "Voornaam" })
+  firstname: string;
+
+  @Column({ name: "Familienaam" })
+  lastname: string;
 
   @Column({ name: "Functie" })
   function: string;
@@ -41,15 +53,6 @@ export class User {
   @Column({ name: "adres" })
   address: string;
 
-  @Column({ name: "Familienaam" })
-  lastname: string;
-
   @Column({ name: "telefoonnummer" })
   phone: string;
-
-  @Column({ name: "Voornaam" })
-  firstname: string;
-
-  @Column({ name: "personeelsNr" })
-  personeelsNr: string;
 }

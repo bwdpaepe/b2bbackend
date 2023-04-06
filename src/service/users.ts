@@ -69,8 +69,8 @@ const getUserViaJwtToken = async (ctx: Koa.Context) => {
  * BELANGRIJK: email heeft UNIQUE constraint in database, dus kan altijd maar 1 user returnen
  */
 const getUserByEmail = async (ctx: any) => {
-  debugLog("GET user by username: " + ctx.query.userName);
-  const userToCheck: string = ctx.query.userName;
+  debugLog("GET user by email: " + ctx.query.email);
+  const userToCheck: string = ctx.query.email;
   const user = await usersRepository.findOneBy({
     email: userToCheck,
   });
