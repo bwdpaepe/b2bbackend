@@ -51,11 +51,11 @@ export default function installUsersRoutes(app: any) {
    * PROTECTED ROUTES
    */
   
-  // GET all users - Only allowed for Role.USERADMIN
+  // GET all users
   router.get(
     "/all",
-    // authService.requireAuthentication,
-    // authService.checkRolePermission(Roles.USERADMIN),
+    authService.requireAuthentication,
+    authService.checkRolePermission(Functions.AANKOPER),
     getAllUsers
   );
 
@@ -69,8 +69,8 @@ export default function installUsersRoutes(app: any) {
   // GET find user by username
   router.get(
     "/find",
-    // authService.requireAuthentication,
-    // authService.checkRolePermission(Roles.USERADMIN),
+    authService.requireAuthentication,
+    authService.checkRolePermission(Functions.ADMIN),
     getUserByEmail
   );
 
