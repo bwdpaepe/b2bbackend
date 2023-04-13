@@ -43,7 +43,7 @@ const loginValidation = async (ctx: any) => {
       }
       // if user is not an admin or aankoper, throw error
       if (
-        foundUser.function.toLowerCase() !== Functions.ADMIN.toLowerCase() &&
+        //foundUser.function.toLowerCase() !== Functions.ADMIN.toLowerCase() &&  // uncomment this line if you want to allow admins to login
         foundUser.function.toLowerCase() !== Functions.AANKOPER.toLowerCase()
       ) {
         debugLog("User function has no access rights");
@@ -115,10 +115,10 @@ const checkUserPermission = async (requiredFunction: Functions, ctx: any) => {
       throw new Error("User is not active");
     }
     const userFunction = user.function;
-    // check if the user has the required function or is an admin
+    // check if the user has the required function 
     const hasPermission =
-      userFunction.toLowerCase() === requiredFunction.toLowerCase() ||
-      userFunction.toLowerCase() === Functions.ADMIN.toLowerCase();
+      userFunction.toLowerCase() === requiredFunction.toLowerCase() 
+      // || userFunction.toLowerCase() === Functions.ADMIN.toLowerCase(); // admin has access to everything
     debugLog("User function: " + userFunction.toLowerCase() + ", Required function: " + requiredFunction.toLowerCase() + ", Has permission: " + hasPermission );
     if (!hasPermission) {
       throw new Error(
