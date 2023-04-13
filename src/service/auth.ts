@@ -25,13 +25,9 @@ const debugLog = (message: any, meta = {}) => {
 };
 
 const loginValidation = async (ctx: any) => {
-  debugLog(
-    "Checking authorisation of user with email: " + ctx.query.email
-  );
+  debugLog("Checking authorisation of user with email: " + ctx.query.email);
   try {
-    const foundUser = await usersService.getUserByEmailIncludingHashedPW(
-      ctx
-    );
+    const foundUser = await usersService.getUserByEmailIncludingHashedPW(ctx);
 
     const passwordToCheck: string = ctx.query.password;
     const isMatch = bcrypt.compareSync(
@@ -45,15 +41,25 @@ const loginValidation = async (ctx: any) => {
         debugLog("User is not active");
         throw new Error("User is not active");
       }
+      // if user is not an admin or aankoper, throw error
+      if (
+        foundUser.function.toLowerCase() !== Functions.ADMIN.toLowerCase() &&
+        foundUser.function.toLowerCase() !== Functions.AANKOPER.toLowerCase()
+      ) {
+        debugLog("User function has no access rights");
+        throw new Error("User function has no access rights");
+      }
       return makeLoginData(foundUser);
     } else {
       throw new Error("The given email and password do not match");
     }
   } catch (error) {
-    debugLog(
-      "Authorisation of user with email '" + ctx.query.email + "' failed"
+    debugLog("Authorisation of user with email '" + ctx.query.email + "' failed");
+    return (
+      (ctx.status = 401), // 401 = Unauthorized
+      (ctx.body = {error: "Authorisation of user with email '" + ctx.query.email + "' failed", 
+      })
     );
-    return (ctx.status = 401);
   }
 };
 
@@ -75,7 +81,7 @@ const checkAndParseSession = async (authHeader: any) => {
     )) as object;
 
     const values = Object.values(decodedToken);
-    const [email, userId, _function, ...rest] = values;  //_function want function is een reserved keyword
+    const [email, userId, _function, ...rest] = values; //_function want function is een reserved keyword
 
     return {
       email: email as string,
@@ -111,8 +117,9 @@ const checkUserPermission = async (requiredFunction: Functions, ctx: any) => {
     const userFunction = user.function;
     // check if the user has the required function or is an admin
     const hasPermission =
-      userFunction.toLowerCase === requiredFunction.toLowerCase ||
-      userFunction.toLowerCase === Functions.ADMIN.toLowerCase;
+      userFunction.toLowerCase() === requiredFunction.toLowerCase() ||
+      userFunction.toLowerCase() === Functions.ADMIN.toLowerCase();
+    debugLog("User function: " + userFunction.toLowerCase() + ", Required function: " + requiredFunction.toLowerCase() + ", Has permission: " + hasPermission );
     if (!hasPermission) {
       throw new Error(
         "You are not allowed to view this part of the application. User function: " +
