@@ -156,7 +156,7 @@ const checkRolePermission = (requiredFunction: Functions) => {
       debugLog("Authorization failed: " + error);
       return (
         (ctx.status = 403), // 403 = Forbidden
-        (ctx.body = "You do not have permission to access this resource")
+        (ctx.body = { error: "You do not have permission to access this resource"})
       );
     }
   };
