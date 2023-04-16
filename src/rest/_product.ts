@@ -7,8 +7,12 @@ const checkProductEndpoint = async (ctx: Koa.Context) => {
   ctx.body = await productService.checkProductEndpoint();
 };
 
-const getAllProduct = async (ctx: Koa.Context) => {
+const getAllProducts = async (ctx: Koa.Context) => {
   ctx.body = await productService.getAllProduct();
+};
+
+const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
+  ctx.body = await productService.getAllProductsByBedrijfId(ctx);
 };
 
 /*
@@ -28,7 +32,10 @@ export default function installProductRoutes(app: any) {
   router.get("/test", checkProductEndpoint);
 
   // GET all product
-  router.get("/all", getAllProduct);
+  router.get("/all", getAllProducts);
+
+  // GET all products by 'bedrijfId'
+  router.get("/find", getAllProductsByBedrijfId);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of Product Routes (_product.ts) completed`);

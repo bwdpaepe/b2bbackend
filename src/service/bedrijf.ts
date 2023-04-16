@@ -34,13 +34,11 @@ const getBedrijfById = async (ctx: Koa.Context) => {
   debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
   try {
     const bedrijf = await bedrijfRepository.findOne({
-      where: {bedrijfId: Number(ctx.query.bedrijfId)},
+      where: { bedrijfId: Number(ctx.query.bedrijfId) },
     });
 
     if (!bedrijf) {
-      throw new Error(
-        "Bedrijf with id " + ctx.query.bedrijfId + " not found"
-      );
+      throw new Error("Bedrijf with id " + ctx.query.bedrijfId + " not found");
     }
     return bedrijf;
   } catch (error: any) {
