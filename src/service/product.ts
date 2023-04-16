@@ -26,13 +26,12 @@ const getAllProduct = async () => {
   return await productRepository.find();
 };
 
-//TODO
+//WIP
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    const bedrijf = await getBedrijfById(ctx);
-    debugLog("GET list of all products by bedrijfId " + ctx.query.bedrijfId);
+    const bedrijfId = Number(ctx.query.bedrijfId);
     const products = await productRepository.find({
-      where: { bedrijf: bedrijf.bedrijfId },
+      where: { bedrijf: { bedrijfId: bedrijfId } },
     });
     ctx.body = products;
   } catch (error: any) {
