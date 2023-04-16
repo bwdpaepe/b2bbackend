@@ -1,12 +1,19 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Column,
+  JoinColumn,
+} from "typeorm";
 import { Bedrijf } from "./Bedrijf";
 
-@Entity({ name: "product" })
+@Entity({ name: "producten" })
 export class Product {
   @PrimaryGeneratedColumn({ name: "ID" })
   productId: number;
 
   @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products)
+  @JoinColumn({ name: "LEVERANCIER_ID" })
   bedrijf: Bedrijf;
 
   @Column({ name: "NAAM", length: 255, unique: true })
