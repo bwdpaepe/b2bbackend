@@ -2,6 +2,8 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Product } from "../entity/Product";
+import { Bedrijf } from "../entity/Bedrijf";
+import { getBedrijfById } from "../rest/_bedrijf";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -44,6 +46,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
+
 
 export default {
   checkProductEndpoint,
