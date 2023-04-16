@@ -4,6 +4,7 @@ import { logger } from "./server";
 import config from "../config/config";
 import { User } from "./entity/User";
 import { Bedrijf } from "./entity/Bedrijf";
+import { Product } from "./entity/Product";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -14,10 +15,7 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [
-    Bedrijf, 
-    User,
-  ],
+  entities: [Bedrijf, User, Product],
   migrations: [],
   subscribers: [],
 });

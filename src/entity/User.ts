@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
 import { Bedrijf } from "./Bedrijf";
 
 // TODO - relaties met andere entiteiten toevoegen
@@ -8,7 +14,7 @@ export class User {
   @PrimaryGeneratedColumn({ name: "ID" })
   userId: number;
 
-  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.users /** , { eager: true } */)  // Nu om te testen eager, later lazy van maken !!!
+  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.users /** , { eager: true } */) // Nu om te testen eager, later lazy van maken !!!
   @JoinColumn({ name: "bedrijf_id" })
   bedrijf: Bedrijf;
 

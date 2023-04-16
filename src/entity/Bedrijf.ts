@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { User } from "./User";
+import { Product } from "./Product";
 
 @Entity({ name: "BEDRIJF" })
 export class Bedrijf {
@@ -8,6 +9,9 @@ export class Bedrijf {
 
   @OneToMany(() => User, (user) => user.bedrijf)
   users: User[];
+
+  @OneToMany(() => Product, (product) => product.bedrijf)
+  products: Product[];
 
   @Column({
     name: "NAAM",
