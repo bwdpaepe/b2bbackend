@@ -29,14 +29,21 @@ const getAllProduct = async () => {
 //WIP
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
+    debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
     const bedrijfId = Number(ctx.query.bedrijfId);
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
     });
-    ctx.body = products;
+
+    if (!products || !products.length) {
+      throw new Error(
+        "There were no products found for bedrijf with id " + bedrijfId
+      );
+    }
+
+    return products;
   } catch (error: any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+    return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
 
