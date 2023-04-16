@@ -19,6 +19,12 @@ const checkProductEndpoint = async () => {
   return "Product endpoint is available";
 };
 
+const getAllProduct = async () => {
+  debugLog("GET list of all products");
+  return await productRepository.find();
+};
+
 export default {
   checkProductEndpoint,
+  getAllProduct,
 };
