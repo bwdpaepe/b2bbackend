@@ -42,4 +42,10 @@ export class Bestelling {
 
   @Column({ name: "TRACKANDTRACECODE", type: "varchar", length: 255 })
   trackAndTraceCode: string;
+
+
+  getStatusDescription(): string {
+    return BestellingStatus[this.status];
+  }
+  
 }

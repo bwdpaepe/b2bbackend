@@ -17,7 +17,7 @@ export class Notification {
   @Column({ name: "CREATIONDATE", type: "date" })
   creationDate: Date;
 
-  @Column({ name: "ISBEKEKEN", type: "boolean" })
+  @Column({ name: "ISBEKENEN", type: "boolean" })
   isBekeken: boolean;
 
   @ManyToOne(() => User, (user) => user.notifications)
