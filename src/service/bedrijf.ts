@@ -33,25 +33,50 @@ const getAllBedrijf = async () => {
  * get company profile
  */
 
-const getBedrijfProfiel = async (ctx: any) =>{
+const getBedrijfProfiel = async (ctx: any) => {
   try {
     const id = ctx.params.id;
     debugLog("getting company profile " + id);
-    const bedrijf : Bedrijf = await bedrijfRepository.findOne({ relations:{users : true}, where : {bedrijfId : id, users:{function : "AANKOPER"}}})
-    if(bedrijf){
-    const {naam, straat, huisnummer, postcode, stad, land, telefoonnummer, logoFilename, users} = bedrijf;
-    const bedrijfInfo = {naam, straat, huisnummer, postcode, stad, land,telefoonnummer,logoFilename, users};
-    return bedrijfInfo; 
+    const bedrijf: Bedrijf = await bedrijfRepository.findOne({
+      relations: { users: true },
+      where: { bedrijfId: id, users: { function: "AANKOPER" } },
+    });
+    if (bedrijf) {
+      const {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        users,
+      } = bedrijf;
+      const bedrijfInfo = {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        users,
+      };
+      return bedrijfInfo;
+    } else {
+      return (
+        (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
+      );
     }
-    else {
-      return (ctx.status = 404),(ctx.body = {error : "Dit bedrijf bestaat niet"});
-    }
-    
   } catch (error) {
-    return (ctx.status = 400),(ctx.body = {error : "Er ging iets mis bij het laden van het profiel"})
+    return (
+      (ctx.status = 400),
+      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" })
+    );
   }
-
-}
+};
 
 /**
  * Get bedrijf via bedrijfId
@@ -60,13 +85,11 @@ const getBedrijfById = async (ctx: Koa.Context) => {
   debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
   try {
     const bedrijf = await bedrijfRepository.findOne({
-      where: {bedrijfId: Number(ctx.query.bedrijfId)},
+      where: { bedrijfId: Number(ctx.query.bedrijfId) },
     });
 
     if (!bedrijf) {
-      throw new Error(
-        "Bedrijf with id " + ctx.query.bedrijfId + " not found"
-      );
+      throw new Error("Bedrijf with id " + ctx.query.bedrijfId + " not found");
     }
     return bedrijf;
   } catch (error: any) {
@@ -78,5 +101,5 @@ export default {
   checkBedrijfEndpoint,
   getAllBedrijf,
   getBedrijfById,
-  getBedrijfProfiel
+  getBedrijfProfiel,
 };
