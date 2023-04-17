@@ -36,8 +36,10 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
     });
 
     if (!products || !products.length) {
-      throw new Error(
-        "There were no products found for bedrijf with id " + bedrijfId
+      return (
+        (ctx.status = 204),
+        (ctx.body =
+          "There were no products found for bedrijf with id " + bedrijfId)
       );
     }
 
