@@ -4,6 +4,8 @@ import { logger } from "./server";
 import config from "../config/config";
 import { User } from "./entity/User";
 import { Bedrijf } from "./entity/Bedrijf";
+import { Bestelling } from "./entity/Bestelling";
+import { Notification } from './entity/Notification';
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -17,6 +19,8 @@ export const AppDataSource = new DataSource({
   entities: [
     Bedrijf, 
     User,
+    Bestelling,
+    Notification,
   ],
   migrations: [],
   subscribers: [],

@@ -1,5 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from "typeorm";
 import { Bedrijf } from "./Bedrijf";
+import { Notification } from "./Notification";
+import { Bestelling } from './Bestelling';
 
 // TODO - relaties met andere entiteiten toevoegen
 // OPLETTEN: table names zijn hoofdlettergevoelig in MySQL !!! Goed kijken naar exacte naam van de tabel in de remote DB (vichogent server)
@@ -8,9 +17,12 @@ export class User {
   @PrimaryGeneratedColumn({ name: "ID" })
   userId: number;
 
-  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.users /** , { eager: true } */)  // Nu om te testen eager, later lazy van maken !!!
+  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.users /** , { eager: true } */) // Nu om te testen eager, later lazy van maken !!!
   @JoinColumn({ name: "bedrijf_id" })
   bedrijf: Bedrijf;
+
+  @OneToMany(() => Notification, (notification) => notification.aankoper)
+  notifications: Notification[];
 
   @Column({
     name: "Email_adres",
@@ -49,4 +61,7 @@ export class User {
 
   @Column({ name: "telefoonnummer" })
   phone: string;
+
+  @OneToMany(() => Bestelling, (notification) => notification.aankoper)
+  bestellingenAlsAankoper: Bestelling[];
 }

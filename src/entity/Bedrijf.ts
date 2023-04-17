@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Bestelling } from "./Bestelling";
 import { User } from "./User";
 
 @Entity({ name: "BEDRIJF" })
@@ -57,4 +58,10 @@ export class Bedrijf {
     length: 255,
   })
   telefoonnummer: string;
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.leverancierBedrijf)
+  bestellingenAlsLeverancier: Bestelling[];
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.klantBedrijf)
+  bestellingenAlsKlant: Bestelling[];
 }
