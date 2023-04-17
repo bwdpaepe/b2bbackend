@@ -24,6 +24,9 @@ export class User {
   @OneToMany(() => Notification, (notification) => notification.aankoper)
   notifications: Notification[];
 
+  @OneToMany(() => Bestelling, (notification) => notification.aankoper)
+  bestellingenAlsAankoper: Bestelling[];
+
   @Column({
     name: "Email_adres",
     length: 255,
@@ -61,7 +64,4 @@ export class User {
 
   @Column({ name: "telefoonnummer" })
   phone: string;
-
-  @OneToMany(() => Bestelling, (notification) => notification.aankoper)
-  bestellingenAlsAankoper: Bestelling[];
 }

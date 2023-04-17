@@ -17,13 +17,15 @@ export class Bestelling {
   bestellingId: number;
 
   @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.bestellingenAlsLeverancier)
+  @JoinColumn({ name: "Leverancier" })
   leverancierBedrijf: Bedrijf;
 
   @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.bestellingenAlsKlant)
+  @JoinColumn({ name: "Klant" })
   klantBedrijf: Bedrijf;
 
   @ManyToOne(() => User, (user) => user.bestellingenAlsAankoper)
-  @JoinColumn({ name: "MEDEWERKER" })
+  @JoinColumn({ name: "Medewerker" })
   aankoper: User;
 
   @OneToOne(() => Notification, (notification) => notification.bestelling)

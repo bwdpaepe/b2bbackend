@@ -7,6 +7,12 @@ export class Bedrijf {
   @PrimaryGeneratedColumn({ name: "ID" })
   bedrijfId: number;
 
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.leverancierBedrijf)
+  bestellingenAlsLeverancier: Bestelling[];
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.klantBedrijf)
+  bestellingenAlsKlant: Bestelling[];
+
   @OneToMany(() => User, (user) => user.bedrijf)
   users: User[];
 
@@ -58,10 +64,4 @@ export class Bedrijf {
     length: 255,
   })
   telefoonnummer: string;
-
-  @OneToMany(() => Bestelling, (bestelling) => bestelling.leverancierBedrijf)
-  bestellingenAlsLeverancier: Bestelling[];
-
-  @OneToMany(() => Bestelling, (bestelling) => bestelling.klantBedrijf)
-  bestellingenAlsKlant: Bestelling[];
 }
