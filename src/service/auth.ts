@@ -5,6 +5,7 @@ import { User } from "../entity/User";
 import jwtService from "../core/jwt";
 import { Functions } from "../enums/Functions";
 import { Next } from "koa";
+import sessionService from "./session";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return String(error.message);
@@ -49,6 +50,11 @@ const loginValidation = async (ctx: any) => {
         debugLog("User function has no access rights");
         throw new Error("User function has no access rights");
       }
+
+      debugLog("Authorisation of user with email '" + ctx.query.email + "' succeeded");
+      // save a session in the database, to register the sessionStart and sessionEnd
+      await sessionService.saveSessionStart(foundUser);
+
       return makeLoginData(foundUser);
     } else {
       throw new Error("The given email and password do not match");

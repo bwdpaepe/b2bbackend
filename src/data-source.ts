@@ -5,7 +5,8 @@ import config from "../config/config";
 import { User } from "./entity/User";
 import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
-import { Notification } from './entity/Notification';
+import { Notification } from "./entity/Notification";
+import { Session } from "./entity/Session";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -16,12 +17,7 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [
-    Bedrijf, 
-    User,
-    Bestelling,
-    Notification,
-  ],
+  entities: [Bedrijf, User, Bestelling, Notification, Session],
   migrations: [],
   subscribers: [],
 });
