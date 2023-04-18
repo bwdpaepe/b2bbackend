@@ -101,8 +101,32 @@ const getAllNotificationsForUser = async (ctx: Koa.Context) => {
   }
 };
 
+// check if there are any notifications for a user with isRead = false. 
+const checkForUnreadNotificationsOfUser = async (ctx: Koa.Context) => {
+  try {
+    const JWTUserInfo = await authService.checkAndParseSession(
+      ctx.headers.authorization
+    );
+
+    const userId : number = JWTUserInfo.userId;
+
+    const unreadCount : number = await notificationRepository
+    .createQueryBuilder("n")
+    .where("n.AANKOPER_ID = :userId", { userId })
+    .andWhere("n.ISBEKENEN = :isRead", { isRead: false })
+    .getCount();
+
+    return (ctx.body = {unreadNotifications: unreadCount > 0});
+
+  } catch (error: any) {
+    debugLog("Error in checkForUnreadNotifications: " + error);
+    return (ctx.status = 400), (ctx.body = {error: error.message});
+  }
+};
+
 export default {
   checkNotificationEndpoint,
   // getAllNotifications,
   getAllNotificationsForUser,
+  checkForUnreadNotificationsOfUser,
 };

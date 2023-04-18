@@ -20,6 +20,11 @@ const getAllNotificationsForUser = async (ctx: Koa.Context) => {
   ctx.body = await notificationService.getAllNotificationsForUser(ctx);
 };
 
+// GET check if user has unread notifications
+const checkIfUserHasUnreadNotifications = async (ctx: Koa.Context) => {
+  ctx.body = await notificationService.checkForUnreadNotificationsOfUser(ctx);
+};
+
 export default function installNotificationRoutes(app: any) {
   const router = new Router({
     prefix: "/notification",
@@ -43,6 +48,14 @@ export default function installNotificationRoutes(app: any) {
     authService.requireAuthentication,
     authService.checkRolePermission(Functions.AANKOPER),
     getAllNotificationsForUser
+  );
+
+  // GET check if user has unread notifications
+  router.get(
+    "/user/unread",
+    authService.requireAuthentication,
+    authService.checkRolePermission(Functions.AANKOPER),
+    checkIfUserHasUnreadNotifications
   );
 
   app.use(router.routes()).use(router.allowedMethods());
