@@ -2,6 +2,8 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
+import usersService from "./users";
+import { User } from "../entity/User";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -28,6 +30,55 @@ const getAllBedrijf = async () => {
 };
 
 /**
+ * get company profile
+ */
+
+const getBedrijfProfiel = async (ctx: any) => {
+  try {
+    const id = ctx.params.id;
+    debugLog("getting company profile " + id);
+    const bedrijf: Bedrijf = await bedrijfRepository.findOne({
+      relations: { users: true },
+      where: { bedrijfId: id, users: { function: "AANKOPER" } },
+    });
+    if (bedrijf) {
+      const {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        users,
+      } = bedrijf;
+      const bedrijfInfo = {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        users,
+      };
+      return bedrijfInfo;
+    } else {
+      return (
+        (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
+      );
+    }
+  } catch (error) {
+    return (
+      (ctx.status = 400),
+      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" })
+    );
+  }
+};
+
+/**
  * Get bedrijf via bedrijfId
  */
 const getBedrijfById = async (ctx: Koa.Context) => {
@@ -50,4 +101,5 @@ export default {
   checkBedrijfEndpoint,
   getAllBedrijf,
   getBedrijfById,
+  getBedrijfProfiel,
 };

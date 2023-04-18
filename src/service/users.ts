@@ -133,6 +133,8 @@ const checkIfUserIsLoggedin = async (ctx: Koa.Context) => {
   }
 };
 
+
+
 export default {
   checkUserEndpoint,
   getAllUsers,
@@ -141,4 +143,5 @@ export default {
   getUserByEmail,
   getUserByEmailIncludingHashedPW,
   checkIfUserIsLoggedin,
+
 };
