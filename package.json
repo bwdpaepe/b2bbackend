@@ -13,12 +13,10 @@
     "ts-jest": "^29.0.3"
   },
   "scripts": {
-    "lint": "eslint . --fix",
     "build": "tsc",
     "start": "ts-node-dev src/server.ts",
     "start:prod": "node src/outdir/src/server.js",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "dev": "nodemon --watch src --exec \"ts-node\" src/index.ts"
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "name": "SDP2_TO3_webservice",
   "description": "NodeJS TypeScript Backend",
