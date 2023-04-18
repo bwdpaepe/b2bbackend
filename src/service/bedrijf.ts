@@ -35,11 +35,11 @@ const getAllBedrijf = async () => {
 
 const getBedrijfProfiel = async (ctx: any) => {
   try {
-    const id = ctx.params.id;
-    debugLog("getting company profile " + id);
+    const {bedrijfId} = ctx.state.session ;
+    debugLog("getting company profile " + bedrijfId);
     const bedrijf: Bedrijf = await bedrijfRepository.findOne({
       relations: { users: true },
-      where: { bedrijfId: id, users: { function: "AANKOPER" } },
+      where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
     });
     if (bedrijf) {
       const {
@@ -53,6 +53,8 @@ const getBedrijfProfiel = async (ctx: any) => {
         logoFilename,
         users,
       } = bedrijf;
+
+      const userInfo = users.map(user => {user.firstname, user.lastname, user.personeelsNr, user.email, user.phone})
       const bedrijfInfo = {
         naam,
         straat,
@@ -62,7 +64,7 @@ const getBedrijfProfiel = async (ctx: any) => {
         land,
         telefoonnummer,
         logoFilename,
-        users,
+        userInfo,
       };
       return bedrijfInfo;
     } else {
