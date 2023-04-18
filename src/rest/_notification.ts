@@ -10,10 +10,10 @@ const checkNotificationEndpoint = async (ctx: Koa.Context) => {
   ctx.body = await notificationService.checkNotificationEndpoint();
 };
 
-// GET all notifications
-const getAllNotifications = async (ctx: Koa.Context) => {
-  ctx.body = await notificationService.getAllNotifications();
-};
+// // GET all notifications
+// const getAllNotifications = async (ctx: Koa.Context) => {
+//   ctx.body = await notificationService.getAllNotifications();
+// };
 
 // GET all notifications for a specific user
 const getAllNotificationsForUser = async (ctx: Koa.Context) => {
@@ -31,8 +31,8 @@ export default function installNotificationRoutes(app: any) {
   // Test van notification endpoint
   router.get("/test", checkNotificationEndpoint);
 
-  // GET all notifications
-  router.get("/all", getAllNotifications);
+  // // GET all notifications
+  // router.get("/all", getAllNotifications);
 
   /**
    * PROTECTED ROUTES
@@ -41,6 +41,7 @@ export default function installNotificationRoutes(app: any) {
   router.get(
     "/user",
     authService.requireAuthentication,
+    authService.checkRolePermission(Functions.AANKOPER),
     getAllNotificationsForUser
   );
 
