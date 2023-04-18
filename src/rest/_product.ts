@@ -22,7 +22,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
 export default function installProductRoutes(app: any) {
   const router = new Router({
-    prefix: "/product",
+    prefix: "/products",
   });
 
   /**
@@ -32,10 +32,10 @@ export default function installProductRoutes(app: any) {
   router.get("/test", checkProductEndpoint);
 
   // GET all product
-  router.get("/all", getAllProducts);
+  router.get("/", getAllProducts);
 
   // GET all products by 'bedrijfId'
-  router.get("/find", getAllProductsByBedrijfId);
+  router.get("/:bedrijfId", getAllProductsByBedrijfId);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of Product Routes (_product.ts) completed`);
