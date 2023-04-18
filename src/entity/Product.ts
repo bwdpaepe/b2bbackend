@@ -24,9 +24,9 @@ export class Product {
 
   //TODO - nog toevoegen in DB: afbeelding product
 
-  /*@Column({
-    name: "AFBEELDING_FILENAME",
+  @Column({
+    name: "picture_filename",
     length: 255,
   })
-  logoFilename: string;*/
+  pictureFilename: string;
 }
