@@ -1,17 +1,19 @@
 import config from "../../config/config";
 import jwt from "jsonwebtoken";
 import { logger } from "../server";
+import { User } from "../entity/User";
 
 const JWT_AUDIENCE = config.auth.jwt.audience;
 const JWT_SECRET = config.auth.jwt.secret;
 const JWT_ISSUER = config.auth.jwt.issuer;
 const JWT_EXPIRATION_INTERVAL = config.auth.jwt.expirationInterval;
 
-const generateJWT = (user: { email: string; userId: number; function: string }) => {
+const generateJWT = (user: User) => {
   const tokenData = {
     email: user.email,
     userId: user.userId,
     function: user.function,
+    bedrijfId: user.bedrijf.bedrijfId,
   };
 
   const signOptions = {
