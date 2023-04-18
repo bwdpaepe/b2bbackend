@@ -22,7 +22,8 @@ export class Product {
   @Column({ name: "EENHEIDSPRIJS", type: "double" })
   eenheidsprijs: number;
 
-  //TODO - nog toevoegen in DB: afbeelding product
+  @Column({ name: "voorraad", type: "int" })
+  voorraad: number;
 
   @Column({
     name: "picture_filename",
