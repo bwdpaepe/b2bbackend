@@ -2,6 +2,20 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
+import authService from "./auth";
+import { User } from "../entity/User";
+
+interface BedrijfEntry {
+  bedrijfID: number;
+  huisnummer: string;
+  land: string;
+  logo_filename: string;
+  naam: string;
+  postcode: string;
+  stad: string;
+  straat: string;
+  telefoonnummer: string;
+}
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -10,6 +24,7 @@ const debugLog = (message: any, meta = {}) => {
 // Ophalen repository
 // https://typeorm.io/#using-repositories
 const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
+const userRepository = AppDataSource.getRepository(User);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -48,8 +63,54 @@ const getBedrijfById = async (ctx: Koa.Context) => {
   }
 };
 
+/**
+ * Get bedrijf via aankoperId
+ */
+const getBedrijfByAankoper = async (ctx: Koa.Context) => {
+  try {
+    const JWTUserInfo = await authService.checkAndParseSession(
+      ctx.headers.authorization
+    );
+    const JWTuserId = JWTUserInfo.userId;
+    debugLog(
+      "GET bedrijf for a specific user with id: " + JWTuserId
+    );
+
+
+    const result = await userRepository
+      .createQueryBuilder("u")
+      .select([
+        "b.ID as bedrijfID",
+        "b.HUISNUMMER as huisnummer",
+        "b.LAND as land",
+        "b.LOGO_FILENAME as logo_filename",
+        "b.NAAM as naam",
+        "b.POSTCODE as postcode",
+        "b.STAD as stad",
+        "b.STRAAT as straat",
+        "b.TELEFOONNUMMER as telefoonnummer",
+      ])
+      .innerJoin("u.bedrijf", "b")
+      .where("u.userId = :userId", { userId: JWTuserId })
+      .getRawOne<BedrijfEntry>();
+
+    if (!result) {
+      debugLog("No bedrijf found for user with userId " + JWTuserId);
+      return (ctx.status = 204), (ctx.body = {error: "No bedrijf found for user with userId " + JWTuserId});
+    }
+
+    
+    return result;
+  } catch (error: any) {
+    debugLog("Error in getBedrijfByAankoper: " + error);
+    return (ctx.status = 400), (ctx.body = {error: error.message});
+  }
+
+};
+
 export default {
   checkBedrijfEndpoint,
   getAllBedrijf,
   getBedrijfById,
+  getBedrijfByAankoper,
 };
