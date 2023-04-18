@@ -35,13 +35,20 @@ const getAllBedrijf = async () => {
 
 const getBedrijfProfiel = async (ctx: any) => {
   try {
+    //bedrijfId halen uit de token
     const {bedrijfId} = ctx.state.session ;
-    debugLog("getting company profile " + bedrijfId);
-    const bedrijf: Bedrijf = await bedrijfRepository.findOne({
-      relations: { users: true },
-      where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
-    });
+    var bedrijf : Bedrijf;
+    if(bedrijfId){
+      debugLog("getting company profile " + bedrijfId);
+      //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
+        bedrijf = await bedrijfRepository.findOne({
+        relations: { users: true },
+        where: { bedrijfId: bedrijfId, users : {function : "AANKOPER"} },
+        
+      });
+    }
     if (bedrijf) {
+      //enkel gewenste properties van een bedrijf filteren
       const {
         naam,
         straat,
@@ -54,7 +61,9 @@ const getBedrijfProfiel = async (ctx: any) => {
         users,
       } = bedrijf;
 
-      const userInfo = users.map(user => {user.firstname, user.lastname, user.personeelsNr, user.email, user.phone})
+      //enkel gewenste properties van een medewerker meegeven, dit is een array, dus vorige manier werkt hier niet
+      const userInfo = users.map((user) => ({firstname : user.firstname, lastname : user.lastname, personeelsNr : user.personeelsNr,email : user.email,phone : user.phone}))
+      //bundelen in 1 object
       const bedrijfInfo = {
         naam,
         straat,
