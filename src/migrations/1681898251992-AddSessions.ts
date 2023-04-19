@@ -26,6 +26,9 @@ export class AddSessions1681898251992 implements MigrationInterface {
                             type: "BIGINT",
                             isNullable: false,
                             isPrimary: true,
+                            isGenerated: true,
+                            generationStrategy: "increment"
+                            
                         },
                         {
                             name : "userId",
@@ -42,12 +45,13 @@ export class AddSessions1681898251992 implements MigrationInterface {
                         {
                             name: "sessionEnd",
                             type: "DATETIME",
-                            isNullable: false,
+                            isNullable: true,
+                            
                         },
                         {
                             name: "lastNotificationCheck",
                             type: "DATETIME",
-                            isNullable: false,
+                            isNullable: true,
                         }
                     ]
                 }

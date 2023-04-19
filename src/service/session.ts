@@ -31,6 +31,7 @@ const saveSessionStart = async (foundUser: User) => {
       session.user = foundUser;
     }
 
+    
     session.sessionStart = new Date();
     const savedSession = await sessionRepository.save(session);
     debugLog(`saveSession saved session: ${savedSession.sessionId} for user: ${foundUser.userId } with sessionStart: ${savedSession.sessionStart}`);
