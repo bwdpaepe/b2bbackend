@@ -2,6 +2,21 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bestelling } from "../entity/Bestelling";
+import { Bedrijf } from "../entity/Bedrijf";
+import { User } from "../entity/User";
+import { Notification } from "../entity/Notification";
+import { BestellingStatus } from "../enums/BestellingStatusEnum";
+
+interface BestellingListEntry {
+  bestellingId: number;
+  leverancierBedrijf: Bedrijf;
+  klantBedrijf: Bedrijf;
+  aankoper: User;
+  status: BestellingStatus;
+  datumGeplaatst: Date;
+  orderId: string;
+  trackAndTraceCode: string;
+}
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -10,6 +25,7 @@ const debugLog = (message: any, meta = {}) => {
 // Ophalen repository
 // https://typeorm.io/#using-repositories
 const bestellingRepository = AppDataSource.getRepository(Bestelling);
+const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -30,26 +46,46 @@ const getAllBestelling = async () => {
 /**
  * Get all orders from company
  */
-/*const getBestellingByCompany = async (ctx: Koa.Context) => {
-  debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
+const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
+  debugLog("GET bedrijf with bedrijfId " + ctx.params.bedrijfId);
   try {
     const bedrijf = await bedrijfRepository.findOne({
-      where: {bedrijfId: Number(ctx.query.bedrijfId)},
+      where: {bedrijfId: Number(ctx.params.bedrijfId)},
     });
 
     if (!bedrijf) {
       throw new Error(
-        "Bedrijf with id " + ctx.query.bedrijfId + " not found"
+        "Bedrijf with id " + ctx.params.bedrijfId + " not found"
       );
     }
-    return bedrijf;
+
+    const query = bestellingRepository
+    .createQueryBuilder("bestelling")
+    .select([
+      "bestelling.ID as bestellingId",
+      "bestelling.Leverancier as leverancierBedrijf",
+      "bestelling.Klant as klantBedrijf",
+      "bestelling.Medewerker as aankoper",
+      "bestelling.STATUS as status",
+      "bestelling.DATUMGEPLAATST as datumGeplaatst",
+      "bestelling.ORDERID as orderId",
+      "bestelling.TRACKANDTRACECODE as trackAndTraceCode",
+    ])
+    .innerJoin("bestelling.klantBedrijf", "k")
+    .where("k.ID = :bedrijfId", { bedrijfId: ctx.params.bedrijfId })
+    .orderBy("bestelling.DATUMGEPLAATST", "DESC");
+
+    const results = await query.getRawMany<BestellingListEntry>();
+    return results;
+
+
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
-*/
+
 export default {
   checkBestellingEndpoint,
   getAllBestelling,
-  //getBedrijfById,
+  getBestellingenVanBedrijf,
 };
