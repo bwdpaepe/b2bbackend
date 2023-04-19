@@ -7,6 +7,7 @@ import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
+import { AddSessions1681898251992 } from "./migrations/1681898251992-AddSessions";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -18,7 +19,7 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
   entities: [Bedrijf, User, Bestelling, Notification, Session],
-  migrations: [],
+  migrations: [AddSessions1681898251992],
   subscribers: [],
 });
 
