@@ -16,7 +16,9 @@
     "build": "tsc",
     "start": "ts-node-dev src/server.ts",
     "start:prod": "node src/outdir/src/server.js",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration" : "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:run",
+    "revert" : "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:revert"
   },
   "name": "SDP2_TO3_webservice",
   "description": "NodeJS TypeScript Backend",
