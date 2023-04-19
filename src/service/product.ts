@@ -19,16 +19,15 @@ const checkProductEndpoint = async () => {
   return "Product endpoint is available";
 };
 
-const getAllProduct = async () => {
-  debugLog("GET list of all products");
-  return await productRepository.find();
-};
-
-//WIP
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
     debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
-    const bedrijfId = Number(ctx.query.bedrijfId);
+    const bedrijfId: any = Number(ctx.query.bedrijfId);
+
+    if (!bedrijfId) {
+      throw new Error("No correct bedrijfId was provided");
+    }
+
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
     });
@@ -36,8 +35,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
     if (!products || !products.length) {
       return (
         (ctx.status = 204),
-        (ctx.body =
-          "There were no products found for bedrijf with id " + bedrijfId)
+        (ctx.body = { error: "No products found for bedrijfId " + bedrijfId })
       );
     }
 
@@ -49,6 +47,5 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
 export default {
   checkProductEndpoint,
-  getAllProduct,
   getAllProductsByBedrijfId,
 };
