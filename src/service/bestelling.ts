@@ -4,7 +4,6 @@ import { AppDataSource } from "../data-source";
 import { Bestelling } from "../entity/Bestelling";
 import { Bedrijf } from "../entity/Bedrijf";
 import { User } from "../entity/User";
-import { Notification } from "../entity/Notification";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
 
 interface BestellingListEntry {
@@ -26,6 +25,7 @@ const debugLog = (message: any, meta = {}) => {
 // https://typeorm.io/#using-repositories
 const bestellingRepository = AppDataSource.getRepository(Bestelling);
 const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
+const userRepository = AppDataSource.getRepository(User);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -42,6 +42,39 @@ const getAllBestelling = async () => {
   debugLog("GET list of all bestellingen");
   return await bestellingRepository.find();
 };
+
+/**
+ * Helper function to process the results of a query to the notification table.
+ */
+async function processBestellingen(results: BestellingListEntry[]) {
+  if (!results || results.length === 0) {
+    return null;
+  }
+
+  const bestellingen = results.map(async (result) => {
+    const naamAankoper = await userRepository.findOne({
+      select: {
+          email: true,
+      },
+      where: {
+        userId: result.aankoper.userId,
+      }
+    });
+    return {
+      bestellingId: result.bestellingId,
+      leverancierBedrijf: result.leverancierBedrijf,
+      klantBedrijf: result.klantBedrijf,
+      aankoper: naamAankoper,
+      status: BestellingStatus[result.status],
+      datumGeplaatst: result.datumGeplaatst,
+      orderId: result.orderId,
+      trackAndTraceCode: result.trackAndTraceCode,
+
+    };
+  });
+
+  return bestellingen;
+}
 
 /**
  * Get all orders from company
@@ -76,7 +109,8 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
     .orderBy("bestelling.DATUMGEPLAATST", "DESC");
 
     const results = await query.getRawMany<BestellingListEntry>();
-    return results;
+    return processBestellingen(results);
+    
 
 
   } catch (error: any) {
