@@ -6,7 +6,7 @@ import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
 import { AddSessions1681898251992 } from "./migrations/1681898251992-AddSessions";
 import { DataSource } from "typeorm";
-import { Module } from "module";
+
 
 export default new DataSource(
 {
