@@ -93,7 +93,7 @@ const checkAndParseSession = async (authHeader: any) => {
       email: email as string,
       userId: userId as number,
       function: _function as string,
-      bedrijfId: bedrijfId as string,
+      bedrijfId: bedrijfId as number,
       authToken,
     };
   } catch (error) {
