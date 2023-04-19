@@ -7,6 +7,12 @@ import {
     TableForeignKey,
 } from "typeorm"
 
+/* deze file wordt gecreerde door de CLI npx typeorm migration:create ./src/migrations/<KIES UW NAAM>
+* voeg daarna deze classe in de migration-data-source.ts en run het script npm run migration
+* Vul zeker ook de public async down const in! dat is het omgekeerde van de up. (zie het als een rollback manier)
+* TypeORM voegt dan een timestamp toe aan de migratie, deze zal maar 1 keer uitgevoerd worden, ongeacht hoe vaak je de migration command uitvoert (tenzij je het revert hebt op een bepaald punt)
+*/
+
 export class AddSessions1681898251992 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
