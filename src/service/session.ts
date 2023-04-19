@@ -58,8 +58,28 @@ const saveSessionEnd = async (ctx: Koa.Context) => {
   }
 };
 
+const getSessionOfUser = async (ctx: Koa.Context) => {
+  try {
+    debugLog(`getSessionOfUser called`);
+    const JWTUserInfo = await authService.checkAndParseSession(
+      ctx.headers.authorization
+    );
+    const existingSession = await sessionRepository.findOne({ where: { user: Equal(JWTUserInfo.userId) } });
+    if (!existingSession) {
+      debugLog(`getSessionOfUser no session found for user: ${JWTUserInfo.userId}`);
+      throw new Error(`getSessionOfUser no session found for user: ${JWTUserInfo.userId}`);
+    }
+    debugLog(`getSessionOfUser found session: ${existingSession.sessionId} for user: ${JWTUserInfo.userId } with sessionStart: ${existingSession.sessionStart}`);
+    return existingSession;
+  } catch (error: any) {
+    debugLog(`getSessionOfUser error: ${error.message}`);
+    throw error;
+  }
+};
+
 export default {
   checkSessionEndpoint,
   saveSessionStart,
   saveSessionEnd,
+  getSessionOfUser,
 };

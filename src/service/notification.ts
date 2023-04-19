@@ -6,10 +6,15 @@ import authService from "./auth";
 import { User } from "../entity/User";
 import { Functions } from "../enums/Functions";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
+import { Session } from "../entity/Session";
+import sessionService from "./session";
+import session from "./session";
+import { NotificationStatus } from "../enums/NotificationStatus";
 
 interface NotificationListEntry {
   notificationID: number;
   isRead: boolean;
+  creationDate: Date;
   bestellingId: number;
   orderId: string;
   bestellingStatus: BestellingStatus;
@@ -31,36 +36,73 @@ const checkNotificationEndpoint = async () => {
 };
 
 /**
- * Get list of all notifications.
- * TESTROUTE -> TODO: VERWIJDEREN
+ * Helper function to fetch the notifications for a user.
+ * The limit parameter is optional and can be used to limit the number of notifications returned.
+
  */
-// const getAllNotifications = async () => {
-//   debugLog("GET list of all notifications");
-//   const notifications = await notificationRepository.find({
-//     relations: [
-//       "aankoper",
-//       "aankoper.bedrijf",
-//       "bestelling",
-//       "bestelling.leverancierBedrijf",
-//       "bestelling.klantBedrijf",
-//     ],
-//   });
+async function fetchNotifications(userId: number, limit?: number): Promise<NotificationListEntry[]> {
+  const query = notificationRepository
+    .createQueryBuilder("n")
+    .select([
+      "n.ID as notificationID",
+      "n.ISBEKENEN as isRead",
+      "n.CREATIONDATE as creationDate",
+      "b.ID as bestellingId",
+      "b.ORDERID as orderId",
+      "b.STATUS as bestellingStatus",
+    ])
+    .innerJoin("n.bestelling", "b")
+    .where("b.Medewerker = :userId", { userId: userId })
+    .orderBy("n.CREATIONDATE", "DESC");
 
-//   const response = notifications.map((notification) => ({
-//     ...notification,
-//     bestelling: {
-//       ...notification.bestelling,
-//       status: notification.bestelling.getStatusDescription(),
-//     },
-//   }));
+  if (limit) {
+    query.limit(limit);
+  }
 
-//   return response;
-// };
+  const results = await query.getRawMany<NotificationListEntry>();
+  return results;
+}
+
+/**
+ * Helper function to process the results of a query to the notification table.
+ */
+ async function processNotifications(results: NotificationListEntry[], ctx: Koa.Context) {
+  if (!results || results.length === 0) {
+    return null;
+  }
+
+  // Get the session info of the user in the session table
+  const sessionInfo = await sessionService.getSessionOfUser(ctx);
+
+  const notifications = results.map((result) => {
+    let status: NotificationStatus;
+    if (result.isRead) {
+      status = NotificationStatus.READ;
+    } else if (sessionInfo.sessionEnd < new Date(result.creationDate)) {
+      status = NotificationStatus.NEW;
+    } else if (sessionInfo.sessionEnd >= new Date(result.creationDate)) {
+      status = NotificationStatus.UNREAD;
+    } else {
+      throw new Error("Unexpected notification state for notification with ID " + result.notificationID); // Should never happen
+    }
+
+    return {
+      notificationID: result.notificationID,
+      creationDate: result.creationDate,
+      bestellingId: result.bestellingId,
+      orderId: result.orderId,
+      bestellingStatus: BestellingStatus[result.bestellingStatus], // Map the int to its corresponding enum string
+      status: NotificationStatus[status], // Add the status property as a string
+    };
+  });
+
+  return notifications;
+}
 
 /**
  * GET list of all notifications for a specific user.
  */
-const getAllNotificationsForUser = async (ctx: Koa.Context) => {
+const getNotificationsForUser = async (ctx: Koa.Context) => {
   try {
     const JWTUserInfo = await authService.checkAndParseSession(
       ctx.headers.authorization
@@ -70,31 +112,24 @@ const getAllNotificationsForUser = async (ctx: Koa.Context) => {
       "GET list of all notifications for a specific user with id: " + JWTuserId
     );
 
-    const results = await notificationRepository
-      .createQueryBuilder("n")
-      .select([
-        "n.ID as notificationID",
-        "n.ISBEKENEN as isRead",
-        "b.ID as bestellingId",
-        "b.ORDERID as orderId",
-        "b.STATUS as bestellingStatus",
-      ])
-      .innerJoin("n.bestelling", "b")
-      .where("b.Medewerker = :userId", { userId: JWTuserId })
-      .getRawMany<NotificationListEntry>();
-
-    if (!results || results.length === 0) {
-      debugLog("No notifications found for user with userId " + JWTuserId);
-      return (ctx.status = 204), (ctx.body = {error: "No notifications found for user with userId " + JWTuserId});
+    let limit: number | undefined;
+    if (ctx.query.limit) {
+      limit = parseInt(ctx.query.limit[0]);
+      if (isNaN(limit) || limit <= 0) {
+        return (ctx.status = 400), (ctx.body = { error: "Invalid limit value" });
+      }
     }
 
-    const notifications = results.map((result) => ({
-      ...result,
-      isRead: !!result.isRead, // Map 0/1 to boolean
-      bestellingStatus: BestellingStatus[result.bestellingStatus], // Map the int to its corresponding enum string
-    }));
+    const results = await fetchNotifications(JWTuserId, limit);
 
+    const notifications = await processNotifications(results, ctx);
+
+    if (!notifications) {
+      debugLog("No notifications found for user with userId " + JWTuserId);
+      return (ctx.status = 204), (ctx.body = {error: "Geen notificaties voor gebruiker met id: " + JWTuserId});
+    }
     return notifications;
+
   } catch (error: any) {
     debugLog("Error in getAllNotificationsForUser: " + error);
     return (ctx.status = 400), (ctx.body = {error: error.message});
@@ -102,7 +137,7 @@ const getAllNotificationsForUser = async (ctx: Koa.Context) => {
 };
 
 // check if there are any notifications for a user with isRead = false. 
-const checkForUnreadNotificationsOfUser = async (ctx: Koa.Context) => {
+const getUnreadNotificationsCount = async (ctx: Koa.Context) => {
   try {
     const JWTUserInfo = await authService.checkAndParseSession(
       ctx.headers.authorization
@@ -116,7 +151,7 @@ const checkForUnreadNotificationsOfUser = async (ctx: Koa.Context) => {
     .andWhere("n.ISBEKENEN = :isRead", { isRead: false })
     .getCount();
 
-    return (ctx.body = {unreadNotifications: unreadCount > 0});
+    return (ctx.body = {unreadNotificationsCount: unreadCount});
 
   } catch (error: any) {
     debugLog("Error in checkForUnreadNotifications: " + error);
@@ -124,9 +159,9 @@ const checkForUnreadNotificationsOfUser = async (ctx: Koa.Context) => {
   }
 };
 
+
 export default {
   checkNotificationEndpoint,
-  // getAllNotifications,
-  getAllNotificationsForUser,
-  checkForUnreadNotificationsOfUser,
+  getNotificationsForUser,
+  getUnreadNotificationsCount,
 };
