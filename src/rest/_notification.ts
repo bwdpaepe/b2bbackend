@@ -20,9 +20,14 @@ const getNotificationsForUser = async (ctx: Koa.Context) => {
   ctx.body = await notificationService.getNotificationsForUser(ctx);
 };
 
-// GET check if user has unread notifications
+// GET the number of unread notifications for a specific user
 const getUnreadNotificationsCount = async (ctx: Koa.Context) => {
   ctx.body = await notificationService.getUnreadNotificationsCount(ctx);
+};
+
+// GET check the number of new notifications for a specific user since last check
+const getNewNotificationsCount = async (ctx: Koa.Context) => {
+  ctx.body = await notificationService.getNewNotificationsCountSinceLastCheck(ctx);
 };
 
 export default function installNotificationRoutes(app: any) {
@@ -56,6 +61,14 @@ export default function installNotificationRoutes(app: any) {
     authService.requireAuthentication,
     authService.checkRolePermission(Functions.AANKOPER),
     getUnreadNotificationsCount
+  );
+
+  // GET check the number of new notifications for a specific user since last check
+  router.get(
+    "/new",
+    authService.requireAuthentication,
+    authService.checkRolePermission(Functions.AANKOPER),
+    getNewNotificationsCount
   );
 
   app.use(router.routes()).use(router.allowedMethods());

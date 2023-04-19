@@ -40,7 +40,7 @@ const checkNotificationEndpoint = async () => {
  * The limit parameter is optional and can be used to limit the number of notifications returned.
 
  */
-async function fetchNotifications(userId: number, limit?: number): Promise<NotificationListEntry[]> {
+async function fetchNotifications(userId: number, limit?: number) {
   const query = notificationRepository
     .createQueryBuilder("n")
     .select([
@@ -136,7 +136,7 @@ const getNotificationsForUser = async (ctx: Koa.Context) => {
   }
 };
 
-// check if there are any notifications for a user with isRead = false. 
+// check the number of notifications for a user with isRead = false. 
 const getUnreadNotificationsCount = async (ctx: Koa.Context) => {
   try {
     const JWTUserInfo = await authService.checkAndParseSession(
@@ -159,9 +159,50 @@ const getUnreadNotificationsCount = async (ctx: Koa.Context) => {
   }
 };
 
+// check if there are any new notification for a user with isRead = false.
+// a notification that is counted as new is a notification that is not read and is created after the session.lastNotificationCheck of the user.
+const getNewNotificationsCountSinceLastCheck = async (ctx: Koa.Context) => {
+  try {
+    const JWTUserInfo = await authService.checkAndParseSession(
+      ctx.headers.authorization
+    );
+      
+    const userId : number = JWTUserInfo.userId;
+
+    const sessionInfo = await sessionService.getSessionOfUser(ctx);
+    
+    const newNotificationsCount : number = await notificationRepository
+    .createQueryBuilder("n")
+    .where("n.AANKOPER_ID = :userId", { userId: userId })
+    .andWhere("n.ISBEKENEN = :isRead", { isRead: false })
+    //.andWhere("n.CREATIONDATE > :lastNotificationCheck", {lastNotificationCheck: sessionInfo.lastNotificationCheck})
+    .andWhere(
+      sessionInfo.lastNotificationCheck
+        ? "n.CREATIONDATE > :lastNotificationCheck"
+        : "n.CREATIONDATE IS NOT NULL",
+      {
+        lastNotificationCheck: sessionInfo.lastNotificationCheck ?? null,
+      }
+    )
+    .getCount();
+
+    sessionInfo.lastNotificationCheck = new Date();
+    await sessionService.updateSession(sessionInfo);
+    debugLog("tot hier ok")
+
+  ctx.body = { newNotificationsCountSinceLastCheck: newNotificationsCount };
+
+  return ctx.body;
+
+  } catch (error: any) {
+    debugLog("Error in checkForUnreadNotifications: " + error);
+    return (ctx.status = 400), (ctx.body = {error: error.message});
+  }
+};
 
 export default {
   checkNotificationEndpoint,
   getNotificationsForUser,
   getUnreadNotificationsCount,
+  getNewNotificationsCountSinceLastCheck,
 };

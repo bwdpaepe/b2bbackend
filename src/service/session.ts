@@ -77,9 +77,22 @@ const getSessionOfUser = async (ctx: Koa.Context) => {
   }
 };
 
+const updateSession = async (session: Session) => {
+  try {
+    debugLog(`updateSession called`);
+    const updatedSession = await sessionRepository.save(session);
+    debugLog(`session updated succesfully`);
+    return updatedSession;
+  } catch (error: any) {
+    debugLog(`updateSession error: ${error.message}`);
+    throw error;
+  }
+};
+
 export default {
   checkSessionEndpoint,
   saveSessionStart,
   saveSessionEnd,
   getSessionOfUser,
+  updateSession,
 };

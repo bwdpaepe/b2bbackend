@@ -15,4 +15,7 @@ export class Session {
 
   @Column()
   sessionEnd: Date;
+
+  @Column()
+  lastNotificationCheck: Date;
 }
