@@ -25,6 +25,7 @@ export default function installProductRoutes(app: any) {
    * PUBLIC ROUTES
    */
   // Test van product endpoint
+  // example http://localhost:9000/api/products/test
   router.get("/test", checkProductEndpoint);
 
   // GET all products by 'bedrijfId'
