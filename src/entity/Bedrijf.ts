@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Bestelling } from "./Bestelling";
 import { User } from "./User";
 import { Product } from "./Product";
 
@@ -6,6 +7,12 @@ import { Product } from "./Product";
 export class Bedrijf {
   @PrimaryGeneratedColumn({ name: "ID" })
   bedrijfId: number;
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.leverancierBedrijf)
+  bestellingenAlsLeverancier: Bestelling[];
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.klantBedrijf)
+  bestellingenAlsKlant: Bestelling[];
 
   @OneToMany(() => User, (user) => user.bedrijf)
   users: User[];

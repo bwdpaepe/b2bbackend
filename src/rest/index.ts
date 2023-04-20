@@ -5,6 +5,9 @@ import installHealthRoutes from "./_health";
 import installAuthRoutes from "./_auth";
 import installUserRoutes from "./_users";
 import installBedrijfRoutes from "./_bedrijf";
+import installProfielRoutes from "./_profile";
+import installNotificationRoutes from "./_notification";
+import installSessionRoutes from "./_session";
 import installProductRoutes from "./_product";
 
 /**
@@ -20,6 +23,9 @@ export default (app: Koa) => {
   installAuthRoutes(router);
   installUserRoutes(router);
   installBedrijfRoutes(router);
+  installProfielRoutes(router);
+  installNotificationRoutes(router);
+  installSessionRoutes(router);
   installProductRoutes(router);
 
   app.use(router.routes()).use(router.allowedMethods());
