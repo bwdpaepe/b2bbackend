@@ -1,10 +1,8 @@
 import Router from "koa-router";
 import bedrijfService from "../service/bedrijf";
-import bestellingService from "../service/bestelling";
 import Koa, { Next } from "koa";
 import { logger } from "../server";
-import { Functions } from "../enums/Functions";
-import authService from "../service/auth";
+
 
 // GET rest route
 const checkBedrijfEndpoint = async (ctx: Koa.Context) => {
@@ -19,15 +17,6 @@ const getAllBedrijf = async (ctx: Koa.Context) => {
 // GET bedrijf by 'bedrijfId'
 export const getBedrijfById = async (ctx: Koa.Context) => {
   ctx.body = await bedrijfService.getBedrijfById(ctx);
-};
-
-// GET bedrijf by 'aankoperId'
-export const getBedrijfByAankoper = async (ctx: Koa.Context) => {
-  ctx.body = await bedrijfService.getBedrijfByAankoper(ctx);
-};
-
-export const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
-  ctx.body = await bestellingService.getBestellingenVanBedrijf(ctx);
 };
 
 /**
@@ -49,39 +38,20 @@ export default function installBedrijfRoutes(app: any) {
   /**
    * PROTECTED ROUTES
    */
-  
-  // GET all bedrijf 
+
+  // GET all bedrijf
   router.get(
     "/all",
     // authService.requireAuthentication,
     getAllBedrijf
   );
 
-  
   // GET bedrijf by 'bedrijfId'
   router.get(
     "/find",
     // authService.requireAuthentication,
     // authService.checkRolePermission(Roles.USERADMIN),
     getBedrijfById
-  );
-
-  // GET bedrijf by aangemelde aankoper
-  // => http://example.com/bedrijf
-  router.get(
-    "/",
-    authService.requireAuthentication,
-    authService.checkRolePermission(Functions.AANKOPER),
-    getBedrijfByAankoper
-  );
-
-  // GET bestellingen van bedrijf
-  // => http://example.com/bedrijf/1/bestelling
-  router.get(
-    "/:bedrijfId/bestelling",
-    authService.requireAuthentication,
-    authService.checkRolePermission(Functions.AANKOPER),
-    getBestellingenVanBedrijf,
   );
 
   app.use(router.routes()).use(router.allowedMethods());
