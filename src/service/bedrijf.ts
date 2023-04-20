@@ -2,21 +2,9 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
-import authService from "./auth";
 import { User } from "../entity/User";
-import usersService from "./users";
 
-interface BedrijfEntry {
-  bedrijfID: number;
-  huisnummer: string;
-  land: string;
-  logo_filename: string;
-  naam: string;
-  postcode: string;
-  stad: string;
-  straat: string;
-  telefoonnummer: string;
-}
+
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);

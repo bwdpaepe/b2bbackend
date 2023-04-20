@@ -1,7 +1,7 @@
 import Router from "koa-router";
 import bedrijfService from "../service/bedrijf";
 import authService from "../service/auth"
-import Koa, { Next } from "koa";
+import Koa from "koa";
 import { logger } from "../server";
 
 

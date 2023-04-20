@@ -1,12 +1,9 @@
 import Koa from "koa";
 import { logger } from "../server";
-import userService from "../service/users";
 import { AppDataSource } from "../data-source";
 import { Bestelling } from "../entity/Bestelling";
-import { Bedrijf } from "../entity/Bedrijf";
-import { User } from "../entity/User";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
-import bedrijf from "./bedrijf";
+
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
