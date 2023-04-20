@@ -39,6 +39,7 @@ export default function installNotificationRoutes(app: any) {
    * PUBLIC ROUTES
    */
   // Test van notification endpoint
+  // example: http://localhost:9000/api/notification/test
   router.get("/test", checkNotificationEndpoint);
 
   // // GET all notifications
@@ -48,6 +49,9 @@ export default function installNotificationRoutes(app: any) {
    * PROTECTED ROUTES
    */
   // GET all notifications for a specific user
+  // this route has an OPTIONAL query parameter "limit" to limit the number of notifications
+  // example: http://localhost:9000/api/notifications  (returns all notifications)
+  // example: http://localhost:9000/api/notifications?limit=5  (returns the last 5 notifications)
   router.get(
     "/",
     authService.requireAuthentication,
@@ -56,6 +60,7 @@ export default function installNotificationRoutes(app: any) {
   );
 
   // GET check if user has unread notifications
+  // example: http://localhost:9000/api/notifications/unread
   router.get(
     "/unread",
     authService.requireAuthentication,
@@ -64,6 +69,7 @@ export default function installNotificationRoutes(app: any) {
   );
 
   // GET check the number of new notifications for a specific user since last check
+  // example: http://localhost:9000/api/notifications/new
   router.get(
     "/new",
     authService.requireAuthentication,

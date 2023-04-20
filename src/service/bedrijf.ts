@@ -50,9 +50,9 @@ const getAllBedrijf = async () => {
 const getBedrijfProfiel = async (ctx: any) => {
   try {
     //bedrijfId halen uit de token
-    const { bedrijfId } = ctx.state.session;
-    let bedrijf: Bedrijf;
-    if (bedrijfId) {
+    const {bedrijfId} = ctx.state.session ;
+    let bedrijf : Bedrijf;
+    if(bedrijfId){
       debugLog("getting company profile " + bedrijfId);
       //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
       bedrijf = await bedrijfRepository.findOne({

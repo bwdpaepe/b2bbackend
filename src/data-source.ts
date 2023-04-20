@@ -18,14 +18,7 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [
-    Bedrijf, 
-    User,
-    Bestelling,
-    Notification,
-    Product,
-    Session
-  ],
+  entities: [Bedrijf, User, Bestelling, Product, Notification, Session],
   migrations: [],
   subscribers: [],
 });
