@@ -18,8 +18,6 @@ interface BedrijfEntry {
   telefoonnummer: string;
 }
 
-
-
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
 };
@@ -52,46 +50,34 @@ const getAllBedrijf = async () => {
 const getBedrijfProfiel = async (ctx: any) => {
   try {
     //bedrijfId halen uit de token
-    const {bedrijfId} = ctx.state.session ;
-    let bedrijf : Bedrijf;
-    if(bedrijfId){
+    const { bedrijfId } = ctx.state.session;
+    let bedrijf: Bedrijf;
+    if (bedrijfId) {
       debugLog("getting company profile " + bedrijfId);
       //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
-        bedrijf = await bedrijfRepository.findOne({
+      bedrijf = await bedrijfRepository.findOne({
         relations: { users: true },
-        where: { bedrijfId: bedrijfId, users : {function : "AANKOPER"} },
-        
+        where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
+        select: {
+          bestellingenAlsKlant: false,
+          bestellingenAlsLeverancier: false,
+          products: false,
+          users: {
+            firstname: true,
+            lastname: true,
+            personeelsNr: true,
+            email: true,
+            phone: true,
+          },
+        },
       });
     }
     if (bedrijf) {
       //enkel gewenste properties van een bedrijf filteren
-      const {
-        naam,
-        straat,
-        huisnummer,
-        postcode,
-        stad,
-        land,
-        telefoonnummer,
-        logoFilename,
-        users,
-      } = bedrijf;
 
       //enkel gewenste properties van een medewerker meegeven, dit is een array, dus vorige manier werkt hier niet
-      const userInfo = users.map((user) => ({firstname : user.firstname, lastname : user.lastname, personeelsNr : user.personeelsNr,email : user.email,phone : user.phone}))
-      //bundelen in 1 object
-      const bedrijfInfo = {
-        naam,
-        straat,
-        huisnummer,
-        postcode,
-        stad,
-        land,
-        telefoonnummer,
-        logoFilename,
-        userInfo,
-      };
-      return bedrijfInfo;
+
+      return bedrijf;
     } else {
       return (
         (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
@@ -133,10 +119,7 @@ const getBedrijfByAankoper = async (ctx: Koa.Context) => {
       ctx.headers.authorization
     );
     const JWTuserId = JWTUserInfo.userId;
-    debugLog(
-      "GET bedrijf for a specific user with id: " + JWTuserId
-    );
-
+    debugLog("GET bedrijf for a specific user with id: " + JWTuserId);
 
     const result = await userRepository
       .createQueryBuilder("u")
@@ -157,16 +140,19 @@ const getBedrijfByAankoper = async (ctx: Koa.Context) => {
 
     if (!result) {
       debugLog("No bedrijf found for user with userId " + JWTuserId);
-      return (ctx.status = 204), (ctx.body = {error: "No bedrijf found for user with userId " + JWTuserId});
+      return (
+        (ctx.status = 204),
+        (ctx.body = {
+          error: "No bedrijf found for user with userId " + JWTuserId,
+        })
+      );
     }
 
-    
     return result;
   } catch (error: any) {
     debugLog("Error in getBedrijfByAankoper: " + error);
-    return (ctx.status = 400), (ctx.body = {error: error.message});
+    return (ctx.status = 400), (ctx.body = { error: error.message });
   }
-
 };
 
 export default {
