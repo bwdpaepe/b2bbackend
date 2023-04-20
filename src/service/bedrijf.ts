@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
 import authService from "./auth";
 import { User } from "../entity/User";
+import usersService from "./users";
 
 interface BedrijfEntry {
   bedrijfID: number;
@@ -16,6 +17,8 @@ interface BedrijfEntry {
   straat: string;
   telefoonnummer: string;
 }
+
+
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -43,19 +46,77 @@ const getAllBedrijf = async () => {
 };
 
 /**
+ * get company profile
+ */
+
+const getBedrijfProfiel = async (ctx: any) => {
+  try {
+    //bedrijfId halen uit de token
+    const {bedrijfId} = ctx.state.session ;
+    var bedrijf : Bedrijf;
+    if(bedrijfId){
+      debugLog("getting company profile " + bedrijfId);
+      //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
+        bedrijf = await bedrijfRepository.findOne({
+        relations: { users: true },
+        where: { bedrijfId: bedrijfId, users : {function : "AANKOPER"} },
+        
+      });
+    }
+    if (bedrijf) {
+      //enkel gewenste properties van een bedrijf filteren
+      const {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        users,
+      } = bedrijf;
+
+      //enkel gewenste properties van een medewerker meegeven, dit is een array, dus vorige manier werkt hier niet
+      const userInfo = users.map((user) => ({firstname : user.firstname, lastname : user.lastname, personeelsNr : user.personeelsNr,email : user.email,phone : user.phone}))
+      //bundelen in 1 object
+      const bedrijfInfo = {
+        naam,
+        straat,
+        huisnummer,
+        postcode,
+        stad,
+        land,
+        telefoonnummer,
+        logoFilename,
+        userInfo,
+      };
+      return bedrijfInfo;
+    } else {
+      return (
+        (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
+      );
+    }
+  } catch (error) {
+    return (
+      (ctx.status = 400),
+      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" })
+    );
+  }
+};
+
+/**
  * Get bedrijf via bedrijfId
  */
 const getBedrijfById = async (ctx: Koa.Context) => {
   debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
   try {
     const bedrijf = await bedrijfRepository.findOne({
-      where: {bedrijfId: Number(ctx.query.bedrijfId)},
+      where: { bedrijfId: Number(ctx.query.bedrijfId) },
     });
 
     if (!bedrijf) {
-      throw new Error(
-        "Bedrijf with id " + ctx.query.bedrijfId + " not found"
-      );
+      throw new Error("Bedrijf with id " + ctx.query.bedrijfId + " not found");
     }
     return bedrijf;
   } catch (error: any) {
@@ -113,4 +174,5 @@ export default {
   getAllBedrijf,
   getBedrijfById,
   getBedrijfByAankoper,
+  getBedrijfProfiel,
 };

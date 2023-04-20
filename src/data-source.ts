@@ -6,6 +6,7 @@ import { User } from "./entity/User";
 import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
 import { Notification } from './entity/Notification';
+import { Product } from "./entity/Product";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -21,6 +22,7 @@ export const AppDataSource = new DataSource({
     User,
     Bestelling,
     Notification,
+    Product
   ],
   migrations: [],
   subscribers: [],
