@@ -7,7 +7,6 @@ import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
-
 import { Product } from "./entity/Product";
 
 export const AppDataSource = new DataSource({

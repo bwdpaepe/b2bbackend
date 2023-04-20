@@ -45,7 +45,6 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   }
 };
 
-
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
