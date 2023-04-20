@@ -33,7 +33,7 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
       const bestellingen: Bestelling[] = await bestellingRepository.find({
         relations: {
           leverancierBedrijf: true,
-          klantBedrijf: true,
+          klantBedrijf: false,
           aankoper: true,
         },
         where: { klantBedrijf: {bedrijfId : bedrijfId} },
