@@ -59,9 +59,6 @@ const getBedrijfProfiel = async (ctx: any) => {
         relations: { users: true },
         where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
         select: {
-          bestellingenAlsKlant: false,
-          bestellingenAlsLeverancier: false,
-          products: false,
           users: {
             firstname: true,
             lastname: true,
@@ -72,21 +69,18 @@ const getBedrijfProfiel = async (ctx: any) => {
         },
       });
     }
+    debugLog(JSON.stringify(bedrijf))
     if (bedrijf) {
-      //enkel gewenste properties van een bedrijf filteren
-
-      //enkel gewenste properties van een medewerker meegeven, dit is een array, dus vorige manier werkt hier niet
-
       return bedrijf;
     } else {
       return (
         (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
       );
     }
-  } catch (error) {
+  } catch (error : any) {
     return (
       (ctx.status = 400),
-      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" })
+      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" + error.message })
     );
   }
 };
