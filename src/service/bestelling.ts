@@ -36,7 +36,8 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           klantBedrijf: false,
           aankoper: true,
         },
-        where: { klantBedrijf: {bedrijfId : bedrijfId} },
+        select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
+        where: { klantBedrijf: {bedrijfId : bedrijfId} }, 
       });
       const bestellingInfo = bestellingen.map((bestelling: Bestelling) => ({
         ...bestelling,
