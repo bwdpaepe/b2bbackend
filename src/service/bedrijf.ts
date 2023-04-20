@@ -60,6 +60,7 @@ const getBedrijfProfiel = async (ctx: any) => {
         where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
         select: {
           users: {
+            userId: true,
             firstname: true,
             lastname: true,
             personeelsNr: true,
