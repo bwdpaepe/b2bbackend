@@ -79,12 +79,9 @@ async function processBestellingen(results: BestellingListEntry[]) {
 
     };
   });
+  
+  return await Promise.all(bestellingen);
 
-  /*bestellingen.map((bestelling) => {
-    debugLog("bestelling " + bestelling.bestellingId);
-  });*/
-
-  return bestellingen;
 }
 
 /**
@@ -96,7 +93,7 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
     const bedrijf = await bedrijfRepository.findOne({
       where: {bedrijfId: Number(ctx.params.bedrijfId)},
     });
-
+    
     if (!bedrijf) {
       throw new Error(
         "Bedrijf with id " + ctx.params.bedrijfId + " not found"
@@ -120,9 +117,8 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
     .orderBy("bestelling.DATUMGEPLAATST", "DESC");
 
     const results = await query.getRawMany<BestellingListEntry>();
-    return await processBestellingen(results);
-    
 
+    return await processBestellingen(results);
 
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
