@@ -43,6 +43,19 @@ const getAllBestelling = async () => {
   return await bestellingRepository.find();
 };
 
+async function getNaamAankoper(userId: number) {
+  const naamAankoper = await userRepository.findOne({
+    select: {
+        email: true,
+    },
+    where: {
+      userId: userId,
+    }
+  });
+  debugLog("naam aankoper: " + naamAankoper.email);
+  return naamAankoper.email;
+}
+
 /**
  * Helper function to process the results of a query to the notification table.
  */
@@ -52,14 +65,8 @@ async function processBestellingen(results: BestellingListEntry[]) {
   }
 
   const bestellingen = results.map(async (result) => {
-    const naamAankoper = await userRepository.findOne({
-      select: {
-          email: true,
-      },
-      where: {
-        userId: result.aankoper.userId,
-      }
-    });
+    const naamAankoper = await getNaamAankoper(result.aankoper.userId);
+    debugLog("naam aankoper: " + naamAankoper);
     return {
       bestellingId: result.bestellingId,
       leverancierBedrijf: result.leverancierBedrijf,
@@ -72,6 +79,10 @@ async function processBestellingen(results: BestellingListEntry[]) {
 
     };
   });
+
+  /*bestellingen.map((bestelling) => {
+    debugLog("bestelling " + bestelling.bestellingId);
+  });*/
 
   return bestellingen;
 }
@@ -109,7 +120,7 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
     .orderBy("bestelling.DATUMGEPLAATST", "DESC");
 
     const results = await query.getRawMany<BestellingListEntry>();
-    return processBestellingen(results);
+    return await processBestellingen(results);
     
 
 
