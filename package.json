@@ -19,7 +19,7 @@
     "start:prod": "node src/outdir/src/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration": "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:run",
-    "seed": "ts-node-dev ./src/migrations/productSeeding.ts",
+    "seed": "ts-node-dev ./src/seeding/productSeeding.ts",
     "revert": "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:revert"
   },
   "name": "SDP2_TO3_webservice",
