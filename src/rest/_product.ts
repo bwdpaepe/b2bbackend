@@ -1,6 +1,6 @@
 import Router from "koa-router";
 import productService from "../service/product";
-import Koa, { Next } from "koa";
+import Koa from "koa";
 import { logger } from "../server";
 
 /*
