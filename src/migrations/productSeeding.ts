@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { Product } from "../entity/Product";
-import { AppDataSource } from "../data-source";
+import seedingSource from "../seeding-data-source.";
 
-const productRepository = AppDataSource.getRepository(Product);
+const productRepository = seedingSource.getRepository(Product);
 
 // Create a function to generate a new value for the voorraad and pictureFilename columns
 function generateVoorraadPictureFilenameAndDesription(): [
@@ -21,18 +21,18 @@ function generateVoorraadPictureFilenameAndDesription(): [
 
 // Generate new data for the voorraad and pictureFilename columns for an existing product
 function updateProduct(product: Product): Product {
-  const [voorraad, pictureFilename, omscrijving] =
+  const [voorraad, pictureFilename, omschrijving] =
     generateVoorraadPictureFilenameAndDesription();
   product.voorraad = voorraad;
   product.pictureFilename = pictureFilename;
-  product.omschrijving = omscrijving;
+  product.omschrijving = omschrijving;
   return product;
 }
 
 // Update the voorraad and pictureFilename columns for all products in the database
 async function updateProducts(): Promise<void> {
   const products = await productRepository.find();
-  products.forEach((product) => {
+  products.forEach((product: Product) => {
     updateProduct(product);
     productRepository.save(product);
   });

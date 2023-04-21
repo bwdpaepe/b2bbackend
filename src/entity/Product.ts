@@ -19,9 +19,6 @@ export class Product {
   @Column({ name: "NAAM", length: 255, unique: true })
   naam: string;
 
-  @Column({ name: "omschrijving", type: "text" })
-  omschrijving: string;
-
   @Column({ name: "EENHEIDSPRIJS", type: "double" })
   eenheidsprijs: number;
 
@@ -33,4 +30,7 @@ export class Product {
     length: 255,
   })
   pictureFilename: string;
+
+  @Column({ name: "omschrijving", type: "text" })
+  omschrijving: string;
 }
