@@ -2,8 +2,9 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
-import usersService from "./users";
 import { User } from "../entity/User";
+
+
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -12,6 +13,7 @@ const debugLog = (message: any, meta = {}) => {
 // Ophalen repository
 // https://typeorm.io/#using-repositories
 const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
+const userRepository = AppDataSource.getRepository(User);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -41,50 +43,33 @@ const getBedrijfProfiel = async (ctx: any) => {
     if(bedrijfId){
       debugLog("getting company profile " + bedrijfId);
       //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
-        bedrijf = await bedrijfRepository.findOne({
+      bedrijf = await bedrijfRepository.findOne({
         relations: { users: true },
-        where: { bedrijfId: bedrijfId, users : {function : "AANKOPER"} },
-        
+        where: { bedrijfId: bedrijfId, users: { function: "AANKOPER" } },
+        select: {
+          users: {
+            userId: true,
+            firstname: true,
+            lastname: true,
+            personeelsNr: true,
+            email: true,
+            phone: true,
+          },
+        },
       });
     }
+    debugLog(JSON.stringify(bedrijf))
     if (bedrijf) {
-      //enkel gewenste properties van een bedrijf filteren
-      const {
-        naam,
-        straat,
-        huisnummer,
-        postcode,
-        stad,
-        land,
-        telefoonnummer,
-        logoFilename,
-        users,
-      } = bedrijf;
-
-      //enkel gewenste properties van een medewerker meegeven, dit is een array, dus vorige manier werkt hier niet
-      const userInfo = users.map((user) => ({firstname : user.firstname, lastname : user.lastname, personeelsNr : user.personeelsNr,email : user.email,phone : user.phone}))
-      //bundelen in 1 object
-      const bedrijfInfo = {
-        naam,
-        straat,
-        huisnummer,
-        postcode,
-        stad,
-        land,
-        telefoonnummer,
-        logoFilename,
-        userInfo,
-      };
-      return bedrijfInfo;
+      return bedrijf;
     } else {
       return (
         (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
       );
     }
-  } catch (error) {
+  } catch (error : any) {
     return (
       (ctx.status = 400),
-      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" })
+      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" + error.message })
     );
   }
 };
@@ -107,6 +92,8 @@ const getBedrijfById = async (ctx: Koa.Context) => {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
+
+
 
 export default {
   checkBedrijfEndpoint,

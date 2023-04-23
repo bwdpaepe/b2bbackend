@@ -4,10 +4,11 @@ import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
+import { Product } from "./entity/Product";
 import { AddSessions1681898251992 } from "./migrations/1681898251992-AddSessions";
 import { AlterProducts1682016268609 } from "./migrations/1682016268609-AlterProducts";
 import { DataSource } from "typeorm";
-import { Product } from "./entity/Product";
+
 
 export default new DataSource({
   type: "mysql",

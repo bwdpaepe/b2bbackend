@@ -3,12 +3,8 @@ import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Notification } from "../entity/Notification";
 import authService from "./auth";
-import { User } from "../entity/User";
-import { Functions } from "../enums/Functions";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
-import { Session } from "../entity/Session";
 import sessionService from "./session";
-import session from "./session";
 import { NotificationStatus } from "../enums/NotificationStatus";
 
 interface NotificationListEntry {
