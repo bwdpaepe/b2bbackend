@@ -1,6 +1,6 @@
 import Router from "koa-router";
 import usersService from "../service/users";
-import Koa, { Next } from "koa";
+import Koa from "koa";
 import { logger } from "../server";
 import authService from "../service/auth";
 import { Functions } from "../enums/Functions";

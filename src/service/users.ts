@@ -2,7 +2,6 @@ import Koa from "koa";
 import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
-//import bcrypt from "bcrypt";
 import authService from "./auth";
 
 const debugLog = (message: any, meta = {}) => {

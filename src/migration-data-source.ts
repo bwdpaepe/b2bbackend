@@ -4,6 +4,7 @@ import { Bedrijf } from "./entity/Bedrijf";
 import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
+import { Product } from "./entity/Product";
 import { AddSessions1681898251992 } from "./migrations/1681898251992-AddSessions";
 import { DataSource } from "typeorm";
 
@@ -18,6 +19,6 @@ export default new DataSource(
     database: config.database.database,
     synchronize: false,
     logging: false,
-    entities: [Bedrijf, User, Bestelling, Notification, Session],
+    entities: [Bedrijf, User, Bestelling, Notification, Session, Product],
     migrations: [AddSessions1681898251992],
 });

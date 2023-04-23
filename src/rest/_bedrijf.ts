@@ -1,7 +1,8 @@
 import Router from "koa-router";
 import bedrijfService from "../service/bedrijf";
-import Koa, { Next } from "koa";
+import Koa from "koa";
 import { logger } from "../server";
+
 
 // GET rest route
 const checkBedrijfEndpoint = async (ctx: Koa.Context) => {
@@ -17,7 +18,6 @@ const getAllBedrijf = async (ctx: Koa.Context) => {
 export const getBedrijfById = async (ctx: Koa.Context) => {
   ctx.body = await bedrijfService.getBedrijfById(ctx);
 };
-
 
 /**
  * Install users routes in the given router.
@@ -38,15 +38,14 @@ export default function installBedrijfRoutes(app: any) {
   /**
    * PROTECTED ROUTES
    */
-  
-  // GET all bedrijf 
+
+  // GET all bedrijf
   router.get(
     "/all",
     // authService.requireAuthentication,
     getAllBedrijf
   );
 
-  
   // GET bedrijf by 'bedrijfId'
   router.get(
     "/find",
