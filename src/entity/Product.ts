@@ -26,8 +26,11 @@ export class Product {
   voorraad: number;
 
   @Column({
-    name: "picture_filename",
+    name: "picture_filepath",
     length: 255,
   })
   pictureFilename: string;
+
+  @Column({ name: "omschrijving", type: "text" })
+  omschrijving: string;
 }
