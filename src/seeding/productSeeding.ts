@@ -18,7 +18,37 @@ dotenv.config();
     });
 
     await connection.execute(`
-    UPDATE producten SET picture_filepath = CONCAT('product_picture', ((id - 1) % 25 + 1), '.jpg') WHERE id > 0;
+    
+UPDATE producten SET picture_filepath =
+CASE 
+  WHEN LEVERANCIER_ID = 1 AND id % 5 = 1 THEN 'product_picture1.jpg'
+  WHEN LEVERANCIER_ID = 1 AND id % 5 = 2 THEN 'product_picture5.jpg'
+  WHEN LEVERANCIER_ID = 1 AND id % 5 = 3 THEN 'product_picture2.jpg'
+  WHEN LEVERANCIER_ID = 1 AND id % 5 = 4 THEN 'product_picture3.jpg'
+  WHEN LEVERANCIER_ID = 1 AND id % 5 = 0 THEN 'product_picture4.jpg'
+  WHEN LEVERANCIER_ID = 2 AND id % 5 = 1 THEN 'product_picture6.jpg'
+  WHEN LEVERANCIER_ID = 2 AND id % 5 = 2 THEN 'product_picture10.jpg'
+  WHEN LEVERANCIER_ID = 2 AND id % 5 = 3 THEN 'product_picture7.jpg'
+  WHEN LEVERANCIER_ID = 2 AND id % 5 = 4 THEN 'product_picture8.jpg'
+  WHEN LEVERANCIER_ID = 2 AND id % 5 = 0 THEN 'product_picture9.jpg'
+  WHEN LEVERANCIER_ID = 3 AND id % 5 = 1 THEN 'product_picture11.jpg'
+  WHEN LEVERANCIER_ID = 3 AND id % 5 = 2 THEN 'product_picture15.jpg'
+  WHEN LEVERANCIER_ID = 3 AND id % 5 = 3 THEN 'product_picture12.jpg'
+  WHEN LEVERANCIER_ID = 3 AND id % 5 = 4 THEN 'product_picture13.jpg'
+  WHEN LEVERANCIER_ID = 3 AND id % 5 = 0 THEN 'product_picture14.jpg'
+  WHEN LEVERANCIER_ID = 4 AND id % 5 = 1 THEN 'product_picture16.jpg'
+  WHEN LEVERANCIER_ID = 4 AND id % 5 = 2 THEN 'product_picture20.jpg'
+  WHEN LEVERANCIER_ID = 4 AND id % 5 = 3 THEN 'product_picture17.jpg'
+  WHEN LEVERANCIER_ID = 4 AND id % 5 = 4 THEN 'product_picture18.jpg'
+  WHEN LEVERANCIER_ID = 4 AND id % 5 = 0 THEN 'product_picture19.jpg'
+  WHEN LEVERANCIER_ID = 5 AND id % 5 = 1 THEN 'product_picture21.jpg'
+  WHEN LEVERANCIER_ID = 5 AND id % 5 = 2 THEN 'product_picture25.jpg'
+  WHEN LEVERANCIER_ID = 5 AND id % 5 = 3 THEN 'product_picture22.jpg'
+  WHEN LEVERANCIER_ID = 5 AND id % 5 = 4 THEN 'product_picture23.jpg'
+  WHEN LEVERANCIER_ID = 5 AND id % 5 = 0 THEN 'product_picture24.jpg'
+  ELSE picture_filepath
+END
+WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
   `);
 
     await connection.execute(`UPDATE producten SET voorraad = 
