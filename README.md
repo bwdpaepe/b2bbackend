@@ -34,3 +34,8 @@ De volgende software dient reeds geïnstalleerd is:
 
 - installatie van de dependencies via dit commando: **npm i** <br />
 - starten van de webservice via dit commando: **npm run start** <br />
+
+
+## Online adres van de webservice
+
+[https://sdp2t03-webservice.onrender.com/api/health/ping](https://sdp2t03-webservice.onrender.com/api/health/ping)
