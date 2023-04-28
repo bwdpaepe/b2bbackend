@@ -32,11 +32,20 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       where: { bedrijf: { bedrijfId: bedrijfId } },
     });
 
-    if (!products || !products.length) {
+    if (!products) {
       return (
         (ctx.status = 404),
-        (ctx.body = { error: "No products found for bedrijfId " + bedrijfId })
+        (ctx.body = {
+          error:
+            "There went something wrong when loading products from company with Id:  " +
+            bedrijfId,
+        })
       );
+    }
+
+    if (products.length === 0) {
+      debugLog("No products found for company with Id:  " + bedrijfId);
+      return (ctx.status = 204);
     }
 
     return products;
@@ -59,11 +68,10 @@ const getProductByProductId = async (ctx: Koa.Context) => {
     });
 
     if (!product) {
-      return (
-        (ctx.status = 404),
-        (ctx.body = { error: "No product found for productId " + productId })
-      );
+      debugLog("No product found with Id: " + productId);
+      return (ctx.status = 204);
     }
+
     return product;
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
