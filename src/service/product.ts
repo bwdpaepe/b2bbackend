@@ -34,7 +34,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
     if (!products || !products.length) {
       return (
-        (ctx.status = 204),
+        (ctx.status = 404),
         (ctx.body = { error: "No products found for bedrijfId " + bedrijfId })
       );
     }
@@ -45,7 +45,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   }
 };
 
-const getProductById = async (ctx: Koa.Context) => {
+const getProductByProductId = async (ctx: Koa.Context) => {
   try {
     debugLog("GET product with productId " + ctx.query.productId);
     const productId = Number(ctx.query.productId);
@@ -60,47 +60,10 @@ const getProductById = async (ctx: Koa.Context) => {
 
     if (!product) {
       return (
-        (ctx.status = 204),
+        (ctx.status = 404),
         (ctx.body = { error: "No product found for productId " + productId })
       );
     }
-
-    return product;
-  } catch (error: any) {
-    return (ctx.status = 400), (ctx.body = { error: error.message });
-  }
-};
-
-const getAllProductByBedrijfIdAndProductId = async (ctx: Koa.Context) => {
-  try {
-    debugLog(
-      "GET product with productId " +
-        ctx.query.productId +
-        " with bedrijfId " +
-        ctx.query.bedrijfId
-    );
-    const bedrijfId = Number(ctx.query.bedrijfId);
-    const productId = Number(ctx.query.productId);
-
-    if (!bedrijfId) {
-      throw new Error("No correct bedrijfId was provided");
-    }
-
-    if (!productId) {
-      throw new Error("No correct productId was provided");
-    }
-
-    const product = await productRepository.findOne({
-      where: { bedrijf: { bedrijfId: bedrijfId }, productId: productId },
-    });
-
-    if (!product) {
-      return (
-        (ctx.status = 204),
-        (ctx.body = { error: "No product found for bedrijfId " + bedrijfId })
-      );
-    }
-
     return product;
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
@@ -110,6 +73,5 @@ const getAllProductByBedrijfIdAndProductId = async (ctx: Koa.Context) => {
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
-  getProductById,
-  getAllProductByBedrijfIdAndProductId,
+  getProductByProductId,
 };
