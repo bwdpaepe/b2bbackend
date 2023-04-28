@@ -32,6 +32,8 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           leverancierBedrijf: true,
           klantBedrijf: false,
           aankoper: true,
+          transportdienst: false,
+          notification: false,
         },
         select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
         where: { klantBedrijf: {bedrijfId : bedrijfId} }, 
@@ -50,7 +52,78 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
   }
 };
 
+// GET bestelling by ID
+const getById = async (ctx: Koa.Context) => {
+  const bestellingId = ctx.params.id;
+  debugLog("ophalen bestellingen met Id " + bestellingId);
+  try {
+    if (bestellingId) {
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: true,
+          klantBedrijf: false,
+          aankoper: true,
+          transportdienst: false,
+          notification: false,
+        },
+        select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
+        where: {bestellingId: bestellingId}})
+
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met Id: " + bestellingId);
+          return (ctx.status = 204);
+        }
+
+        return {...bestelling, status: BestellingStatus[bestelling.status]};
+    }
+    else {
+      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
+    }
+
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+  
+};
+
+// GET track and trace by ID
+const getTrackAndTraceById = async (ctx: Koa.Context) => {
+  const bestellingId = ctx.params.id;
+  debugLog("ophalen track and trace met Id " + bestellingId);
+  try{
+    if(bestellingId){
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: false,
+          klantBedrijf: false,
+          aankoper: false,
+          transportdienst: {
+            trackAndTraceFormat: true,
+          },
+          notification: false,
+        },
+        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}},
+        where: {bestellingId: bestellingId}})
+
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met Id: " + bestellingId);
+          return (ctx.status = 204);
+        }
+
+        return {...bestelling, status: BestellingStatus[bestelling.status]};
+    }
+    else{
+      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
+    }
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+  
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
+  getById,
+  getTrackAndTraceById
 };

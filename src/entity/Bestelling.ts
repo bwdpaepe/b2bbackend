@@ -9,6 +9,7 @@ import {
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
 import { Bedrijf } from "./Bedrijf";
 import { Notification } from "./Notification";
+import { Transportdienst } from "./Transportdienst";
 import { User } from './User';
 
 @Entity({ name: "bestelling" })
@@ -27,6 +28,10 @@ export class Bestelling {
   @ManyToOne(() => User, (user) => user.bestellingenAlsAankoper)
   @JoinColumn({ name: "Medewerker" })
   aankoper: User;
+
+  @ManyToOne(() => Transportdienst, (transportdienst) => transportdienst.bestellingen)
+  @JoinColumn({ name: "Transportdienst"})
+  transportdienst: Transportdienst;
 
   @OneToOne(() => Notification, (notification) => notification.bestelling)
   notification: Notification;
