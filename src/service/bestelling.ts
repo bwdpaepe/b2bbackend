@@ -86,24 +86,29 @@ const getById = async (ctx: Koa.Context) => {
   
 };
 
+async function findOneBestelling(bestellingId: number) {
+  //const bestelling: Bestelling = 
+  return (await bestellingRepository.findOne({
+    relations: {
+      leverancierBedrijf: false,
+      klantBedrijf: false,
+      aankoper: false,
+      transportdienst: {
+        trackAndTraceFormat: true,
+      },
+      notification: true,
+    },
+    select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}, notification : {creationDate: true}},
+    where: {bestellingId: bestellingId}}));
+}
+
 // GET track and trace by ID
 const getTrackAndTraceById = async (ctx: Koa.Context) => {
   const bestellingId = ctx.params.id;
   debugLog("ophalen track and trace met Id " + bestellingId);
   try{
     if(bestellingId){
-      const bestelling: Bestelling = await bestellingRepository.findOne({
-        relations: {
-          leverancierBedrijf: false,
-          klantBedrijf: false,
-          aankoper: false,
-          transportdienst: {
-            trackAndTraceFormat: true,
-          },
-          notification: false,
-        },
-        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}},
-        where: {bestellingId: bestellingId}})
+      const bestelling: Bestelling = await findOneBestelling(bestellingId);
 
         if (!bestelling) {
           debugLog("geen bestelling gevonden met Id: " + bestellingId);
@@ -121,9 +126,63 @@ const getTrackAndTraceById = async (ctx: Koa.Context) => {
   
 };
 
+// GET track and trace by ID
+const postTrackAndTraceById = async (ctx: Koa.Context) => {
+  const bestellingId = ctx.params.id;
+  debugLog("ophalen track and trace met Id " + bestellingId);
+  try{
+    if(bestellingId){
+      const bestelling: Bestelling = await findOneBestelling(bestellingId);
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met Id: " + bestellingId);
+          return (ctx.status = 204);
+        }
+
+        // verify the input
+        const {
+          trackAndTrace,
+          verification
+        } = (ctx.request.body as {trackAndTrace: string, verification: string});
+        let errorMessage: string[];
+        
+        // trackandtrace
+        if(!(trackAndTrace === bestelling.trackAndTraceCode)) {
+          errorMessage.push("track and trace code is verkeerd");
+        }
+
+        // verification
+        switch (bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring) {
+          case 'POSTCODE':
+            if(!(verification === bestelling.leveradresPostcode)) {
+              errorMessage.push("verificatie is verkeerd");
+            }
+            break;
+          case 'ORDERID':
+            if(!(verification === bestelling.orderId)) {
+              errorMessage.push("verificatie is verkeerd");
+            }
+            break;
+        }
+
+        if(!(errorMessage.length === 0)) {
+          return(ctx.status = 404),(ctx.body = {error : errorMessage.toString()});
+        }
+
+        return {...bestelling, status: BestellingStatus[bestelling.status]};
+    }
+    else{
+      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
+    }
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+  
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
   getById,
-  getTrackAndTraceById
+  getTrackAndTraceById,
+  postTrackAndTraceById
 };

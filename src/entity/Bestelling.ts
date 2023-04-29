@@ -42,6 +42,9 @@ export class Bestelling {
   @Column({ name: "DATUMGEPLAATST", type: "date" })
   datumGeplaatst: Date;
 
+  @Column({ name: "LEVERADRESPOSTCODE", type: "varchar", length: 255})
+  leveradresPostcode: string;
+
   @Column({ name: "ORDERID", type: "varchar", length: 255 })
   orderId: string;
 
