@@ -57,7 +57,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
 const getProductByProductId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET product with productId " + ctx.query.productId);
+    debugLog("GET product with productId " + ctx.params.productId);
     const productId = Number(ctx.params.productId);
 
     if (!productId) {
