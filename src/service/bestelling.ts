@@ -143,7 +143,8 @@ const postTrackAndTraceById = async (ctx: Koa.Context) => {
           trackAndTrace,
           verification
         } = (ctx.request.body as {trackAndTrace: string, verification: string});
-        let errorMessage: string[];
+        
+        const errorMessage: string[] = [];
         
         // trackandtrace
         if(!(trackAndTrace === bestelling.trackAndTraceCode)) {
@@ -164,8 +165,8 @@ const postTrackAndTraceById = async (ctx: Koa.Context) => {
             break;
         }
 
-        if(!(errorMessage.length === 0)) {
-          return(ctx.status = 404),(ctx.body = {error : errorMessage.toString()});
+        if(errorMessage.length !== 0) {
+          return(ctx.status = 404),(ctx.body = {error : errorMessage.toString()});  // 404: not found
         }
 
         return {...bestelling, status: BestellingStatus[bestelling.status]};
