@@ -4,15 +4,17 @@ import {
   PrimaryGeneratedColumn,
   Column,
   JoinColumn,
+  ManyToMany,
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
+import { Winkelmand } from "./Winkelmand";
 
 @Entity({ name: "producten" })
 export class Product {
   @PrimaryGeneratedColumn({ name: "ID" })
   productId: number;
 
-  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products)
+  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products, {onDelete: "NO ACTION", onUpdate: "NO ACTION"})
   @JoinColumn({ name: "LEVERANCIER_ID" })
   bedrijf: Bedrijf;
 

@@ -1,0 +1,35 @@
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+  } from "typeorm";
+import { Product } from "./Product";
+import { Winkelmand } from "./Winkelmand";
+
+@Entity({name: "winkelmand_producten"})
+export class WinkelmandProducten{
+    @PrimaryGeneratedColumn({name: "id"})
+    id: number
+
+    @PrimaryColumn({type: "int"})
+    product_id: number
+    @PrimaryColumn({type : "int"})
+    winkelmand_id : number
+
+    @OneToOne(() => Winkelmand)
+    @JoinColumn({name: "winkelmand_id"})
+    winkelmand : Winkelmand;
+    @OneToOne(() => Product)
+    @JoinColumn({name : "product_id"})
+    product: Product;
+
+    @Column({name: "aantal"})
+    aantal: number;
+}
