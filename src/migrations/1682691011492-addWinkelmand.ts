@@ -25,33 +25,14 @@ export class addWinkelmand1682691011492 implements MigrationInterface {
 
                         },
                         {
-                            name : "product_id",
+                            name : "winkelmand_producten_id",
                             type: "BIGINT",
-                            isNullable : false,
+                            isNullable : true,
                             isUnique: true,
 
                         }
 
-                    ],
-                    foreignKeys: [
-                    {
-                        name: "user_id",
-                        referencedTableName: "gebruikers",
-                        referencedColumnNames: ["ID"],
-                        columnNames:["user_id"],
-                        onDelete: "NO ACTION",
-                        onUpdate: "NO ACTION"
-                    },
-                    {
-                        name:"product_id",
-                        referencedTableName:"producten",
-                        referencedColumnNames:["ID"],
-                        columnNames:["product_id"],
-                        onDelete: "NO ACTION",
-                        onUpdate: "NO ACTION"
-                    }
-                    ]
-                    
+                    ]                    
                 }
             )
         )

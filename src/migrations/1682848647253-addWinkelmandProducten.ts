@@ -29,26 +29,7 @@ export class addWinkelmandProducten1682848647253 implements MigrationInterface {
                     name: "aantal",
                     type:"int"
                 }
-                ],
-                foreignKeys:[{
-                    name: "winkelmand",
-                    referencedTableName:"winkelmand",
-                    referencedColumnNames:["id"],
-                    columnNames:["winkelmand_id"],
-                    onDelete: "NO ACTION",
-                    onUpdate: "NO ACTION"
-
-                },
-                {
-                    name: "producten_winkelmand",
-                    referencedTableName:"producten",
-                    referencedColumnNames:["ID"],
-                    columnNames:["product_id"],
-                    onDelete:"NO ACTION",
-                    onUpdate:"NO ACTION"
-
-                }
-            ]
+                ]
 
             })
         )

@@ -23,10 +23,10 @@ export class WinkelmandProducten{
     @PrimaryColumn({type : "int"})
     winkelmand_id : number
 
-    @OneToOne(() => Winkelmand)
+    @ManyToOne(() => Winkelmand)
     @JoinColumn({name: "winkelmand_id"})
     winkelmand : Winkelmand;
-    @OneToOne(() => Product)
+    @ManyToOne(() => Product)
     @JoinColumn({name : "product_id"})
     product: Product;
 

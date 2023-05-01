@@ -12,6 +12,7 @@ import { addWinkelmand1682691011492 } from "./migrations/1682691011492-addWinkel
 import { addWinkelmandProducten1682848647253 } from "./migrations/1682848647253-addWinkelmandProducten";
 import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
+import { foreignkeysWinkelmandproducten1682931009287 } from "./migrations/1682931009287-foreignkeysWinkelmandproducten";
 
 
 export default new DataSource({
@@ -24,5 +25,5 @@ export default new DataSource({
   synchronize: false,
   logging: false,
   entities: [Bedrijf, User, Bestelling, Notification, Session, Product, Winkelmand, WinkelmandProducten],
-  migrations: [addWinkelmand1682691011492, addWinkelmandProducten1682848647253],
+  migrations: [addWinkelmand1682691011492, addWinkelmandProducten1682848647253, foreignkeysWinkelmandproducten1682931009287],
 });

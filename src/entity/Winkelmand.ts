@@ -24,8 +24,7 @@ import { WinkelmandProducten } from "./WinkelmandProducten";
     user: User;
 
     @OneToMany(() => WinkelmandProducten, (winkelmandProducten) => winkelmandProducten.winkelmand)
-    @JoinColumn({name: "product_id"})
-    @JoinTable({name: "winkelmand_producten"})
+    @JoinColumn({name: "winkelmand_producten_id"})
     winkelmandProducten: WinkelmandProducten[];  
 
     totaalBedrag: number; 
