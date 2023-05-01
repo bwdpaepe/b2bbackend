@@ -52,12 +52,17 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
   `);
 
     await connection.execute(`UPDATE producten SET voorraad = 
-    CASE id % 5
+    CASE id % 10
       WHEN 0 THEN 0
       WHEN 1 THEN 50
       WHEN 2 THEN 100
       WHEN 3 THEN 150
       WHEN 4 THEN 200
+      WHEN 5 THEN 250
+      WHEN 6 THEN 300
+      WHEN 7 THEN 350
+      WHEN 8 THEN 400
+      WHEN 9 THEN 450
     END
   WHERE id > 0;
   `);
@@ -90,6 +95,36 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     UPDATE producten
     SET naam = CONCAT('LED kaarsen v', ID), picture_filepath = 'kaarsen.jpg', omschrijving = "4 Led kaarsen op batterij (inbegrepen). Batterij ook weer vervangbaar. Het is ideaal als alternatief voor traditionele kaars voor binnen, maar ook voor buiten in een lantaren of een van onze herdenkingslichten. Hebben een lange brandtijd. Het ledje flikkerd net een echte kaars en is 100% veilig."
     WHERE ID IN (2, 7, 12, 17);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Beker v', ID), picture_filepath = 'beker.jpg', omschrijving = 'Drinkbeker van kunststof 300 ml in het roze. Afmetingen: ca. 8 x 10 cm. Inhoud: ca. 300 ml. Materiaal: kunststof.'
+    WHERE ID IN (21, 26, 31, 36);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Koffie Houseblend v', ID), picture_filepath = 'koffie.jpg', omschrijving = 'Onze ‘House Blend’ is een mengeling van de Colombia, Brazil en Ethiopië. Deze blend heeft een gebalanceerde smaak, ook ideaal in combinatie met melk. De Houseblend heeft een medium body, waarin je zowel de zoete eigenschappen van de Colombia zal smaken als de citrusachtige toetsen van de Ethiopië.'
+    WHERE ID IN (23, 28, 33, 38);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Caffeine serum v', ID), picture_filepath = 'serum.jpg', omschrijving = "Met een zeer geconcentreerde dosering van caffeïne en Epigallocatechine Gallatyl Glucoside (EGCG) afkomstig van groene theeblaadjes, absorbeert het lichte serum snel in het kwetsbare gebied rond de ogen om te helpen verkleuringen te verminderen en symptomen van vermoeidheid en stress te verlichten. De huid voelt verfrist en gelift aan met verbeterde hydratatie en een meer gelijkmatige tint."
+    WHERE ID IN (24, 29, 34, 39);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Zonnebril v', ID), picture_filepath = 'zonnebril.jpg', omschrijving = "Met onze nieuwste model zonnebril creëert u makkelijk een modieuze ‘look’. Onze brillen zijn ideaal voor het strand, park, autorijden en fietsen of tijdens het sporten."
+    WHERE ID IN (25, 30, 35, 40);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Koptelefoon v', ID), picture_filepath = 'koptelefoon.jpg', omschrijving = "De eenvoudig te gebruiken koptelefoon heeft een batterij die tot wel 40 uur meegaat en met de USB-C oplaadkabel binnen 5 minuten oplaadt voor 2 extra uren muziek. En als er iemand belt terwijl je een video op een ander apparaat aan het bekijken bent, schakelt onze koptelefoon naadloos over naar je mobiel."
+    WHERE ID IN (22, 27, 32, 37);
     `);
 
     console.log("Product seeding executed successfully!");
