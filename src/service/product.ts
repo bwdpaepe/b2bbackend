@@ -21,8 +21,7 @@ const checkProductEndpoint = async () => {
 
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
-    //const bedrijfId = Number(ctx.query.bedrijfId);
+    debugLog("GET producten with bedrijfId " + ctx.params.bedrijfId);
     const bedrijfId = Number(ctx.params.bedrijfId);
 
     if (!bedrijfId) {
