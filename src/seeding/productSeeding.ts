@@ -160,6 +160,37 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     WHERE ID IN (42, 47, 52, 57);
     `);
 
+    //Leverancier 4
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Smartwatch v', ID), picture_filepath = 'smartwatch.jpg', omschrijving = 'Waar je ook voor gaat: een betere conditie, fitter worden of allebei, met deze nieuwe smartwatch is jouw personal trainer altijd binnen handbereik en sta je er niet alleen voor.'
+    WHERE ID IN (61, 66, 71, 76);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Namaak banaan v', ID), picture_filepath = 'banaan.jpg', omschrijving = "Banaan fruit decoratie gemaakt van kunststof en verder met de hand afgewerkt."
+    WHERE ID IN (63, 68, 73, 78);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Axe Black Bodyspray Deodorant v', ID), picture_filepath = 'deodorant.jpg', omschrijving = "Verbeterde AXE Black Deodorant Bodyspray: voor effectieve bescherming en een onweerstaanbare geur."
+    WHERE ID IN (64, 69, 74, 79);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Balpen v', ID), picture_filepath = 'balpen.jpg', omschrijving = "De Ray-Ban Justin (RB4165) is een stijlvolle zonnebril geïnspireerd door de iconische Ray-Ban Wayfarer. De Ray-Ban Justin staat voor jeugd en creativiteit. Dit prachtige model heeft grote vierkante lenzen, en een semitransparant montuur afgewerkt met een subtiele rubberlaag."
+    WHERE ID IN (65, 70, 75, 80);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Wijnglas v', ID), picture_filepath = 'wijnglas.jpg', omschrijving = "Dit wijnglas kan voor rode en witte wijn gebruikt worden. Misschien heb jij niet zoveel plek in jouw kast om verschillende wijnglazen te kopen, voor rood en wit. Met dit wijnglas heb je de oplossing."
+    WHERE ID IN (62, 67, 72, 77);
+    `);
+
     console.log("Product seeding executed successfully!");
     connection.end();
   } catch (error) {
