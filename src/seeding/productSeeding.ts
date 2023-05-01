@@ -67,6 +67,7 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
   WHERE id > 0;
   `);
 
+    //Leverancier 1
     await connection.execute(`   
     UPDATE producten
     SET naam = CONCAT('Curology zalf v', ID), picture_filepath = 'curology.jpg', omschrijving = 'De Curology cleanser is een reinigingsproduct dat bedoeld is om vuil, overtollig talg en make-up van het gezicht te verwijderen en de huid voor te bereiden op andere huidverzorgingsproducten. Het product heeft een inhoud van 80 ml en bevat ingrediënten die de huid zacht reinigen zonder deze uit te drogen.'
@@ -97,6 +98,7 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     WHERE ID IN (2, 7, 12, 17);
     `);
 
+    //Leverancier 2
     await connection.execute(`   
     UPDATE producten
     SET naam = CONCAT('Beker v', ID), picture_filepath = 'beker.jpg', omschrijving = 'Drinkbeker van kunststof 300 ml in het roze. Afmetingen: ca. 8 x 10 cm. Inhoud: ca. 300 ml. Materiaal: kunststof.'
@@ -125,6 +127,37 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     UPDATE producten
     SET naam = CONCAT('Koptelefoon v', ID), picture_filepath = 'koptelefoon.jpg', omschrijving = "De eenvoudig te gebruiken koptelefoon heeft een batterij die tot wel 40 uur meegaat en met de USB-C oplaadkabel binnen 5 minuten oplaadt voor 2 extra uren muziek. En als er iemand belt terwijl je een video op een ander apparaat aan het bekijken bent, schakelt onze koptelefoon naadloos over naar je mobiel."
     WHERE ID IN (22, 27, 32, 37);
+    `);
+
+    //Leverancier 3
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Gloss v', ID), picture_filepath = 'gloss.jpg', omschrijving = 'De lipgloss formule is verrijkt met hyaluronzuur, collageen complex, pepermuntolie en menthol voor een plumping effect in de lippen. Hyaluronzuur ondersteunt de vochthuishouding voor hydratatie van de lippen. Het collageen complex versterkt de lippen en accentueert de natuurlijke vorm.'
+    WHERE ID IN (41, 46, 51, 56);    
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Bloempot v', ID), picture_filepath = 'bloempot.jpg', omschrijving = "Deze prachtige design pot van gerecycled plastic is vorstbestendig en daardoor geschikt voor alle seizoenen in de tuin of op het terras. De pot heeft een geïntegreerd waterreservoir dat jouw planten altijd voldoende water hebben. Deze bloempotten zijn gemaakt van hoge kwaliteit plastic, waardoor ze makkelijk schoon te maken zijn, niet snel beschadigen en dus tegen een stootje kunnen."
+    WHERE ID IN (43, 48, 53, 58);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Miniatuurauto v', ID), picture_filepath = 'miniatuurauto.jpg', omschrijving = "Volkswagen Beetle (Garbus) Mexico 1985 (Wit) 1/43 Atlas - Modelauto - Schaalmodel - Modelauto - Miniatuurauto - Miniatuur auto's"
+    WHERE ID IN (44, 49, 54, 59);    
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('RayBan v', ID), picture_filepath = 'rayban.jpg', omschrijving = "De Ray-Ban Justin (RB4165) is een stijlvolle zonnebril geïnspireerd door de iconische Ray-Ban Wayfarer. De Ray-Ban Justin staat voor jeugd en creativiteit. Dit prachtige model heeft grote vierkante lenzen, en een semitransparant montuur afgewerkt met een subtiele rubberlaag."
+    WHERE ID IN (45, 50, 55, 60);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Herenschoenen v', ID), picture_filepath = 'herenschoenen.jpg', omschrijving = "Op zoek naar hoge kwaliteit heren schoenen om je garderobe mee op te vullen? Met deze schoenen heb je altijd een stijlvol schoen in huis. Leren herenschoen in de kleur groen en is gemaakt van Leer en suede met een effen dessin"
+    WHERE ID IN (42, 47, 52, 57);
     `);
 
     console.log("Product seeding executed successfully!");
