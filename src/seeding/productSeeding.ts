@@ -54,18 +54,42 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     await connection.execute(`UPDATE producten SET voorraad = 
     CASE id % 5
       WHEN 0 THEN 0
-      WHEN 1 THEN 5
-      WHEN 2 THEN 10
-      WHEN 3 THEN 15
-      WHEN 4 THEN 20
+      WHEN 1 THEN 50
+      WHEN 2 THEN 100
+      WHEN 3 THEN 150
+      WHEN 4 THEN 200
     END
   WHERE id > 0;
   `);
 
     await connection.execute(`   
     UPDATE producten
-    SET omschrijving = CONCAT('Dit is een omschrijving van ', naam)
-    WHERE ID BETWEEN 1 AND 100
+    SET naam = CONCAT('Curology zalf v', ID), picture_filepath = 'curology.jpg', omschrijving = 'De Curology cleanser is een reinigingsproduct dat bedoeld is om vuil, overtollig talg en make-up van het gezicht te verwijderen en de huid voor te bereiden op andere huidverzorgingsproducten. Het product heeft een inhoud van 80 ml en bevat ingrediënten die de huid zacht reinigen zonder deze uit te drogen.'
+    WHERE ID IN (1, 6, 11, 16);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Computer muis v', ID), picture_filepath = 'muis.jpg', omschrijving = "Deze muis is ontworpen voor comfortabel gebruik met zowel links- als rechtshandige gebruikers. Het heeft een optische sensor die zorgt voor precieze en responsieve tracking en een scrollwiel voor het snel navigeren door webpagina's en documenten."
+    WHERE ID IN (3, 8, 13, 18);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Gameboy Color v', ID), picture_filepath = 'gameboy.jpg', omschrijving = "De Gameboy Color kwam in 1998 op de markt. Samen met de Gameboy Classic zijn er maar liefst 120 miljoen exemplaren verkocht. Met twee AA batterijen kan er ongeveer 13 uur worden gespeeld. Een must-have voor de retro gamer!"
+    WHERE ID IN (4, 9, 14, 19);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Patchouli olie v', ID), picture_filepath = 'patchouli.jpg', omschrijving = "Patchouli olie stimuleert de vernieuwing van je huidcellen, waardoor de olie littekens en acne kan helpen vervagen. Hoe langer je de olie houdt, hoe krachtiger hij wordt, net als een goeie wijn dus verbetert de kwaliteit met de ouderdom. Last but not least, is de olie ook insectwerend."
+    WHERE ID IN (5, 10, 15, 20);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('LED kaarsen v', ID), picture_filepath = 'kaarsen.jpg', omschrijving = "4 Led kaarsen op batterij (inbegrepen). Batterij ook weer vervangbaar. Het is ideaal als alternatief voor traditionele kaars voor binnen, maar ook voor buiten in een lantaren of een van onze herdenkingslichten. Hebben een lange brandtijd. Het ledje flikkerd net een echte kaars en is 100% veilig."
+    WHERE ID IN (2, 7, 12, 17);
     `);
 
     console.log("Product seeding executed successfully!");
