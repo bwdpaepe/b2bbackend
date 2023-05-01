@@ -191,6 +191,37 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     WHERE ID IN (62, 67, 72, 77);
     `);
 
+    //Leverancier 5
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Fles v', ID), picture_filepath = 'fles.jpg', omschrijving = 'De 250 ml fles Basic Round HDPE is een veelzijdige en betrouwbare verpakkingsoptie voor diverse vloeibare producten, zoals cosmetica, persoonlijke verzorgingsproducten, huishoudelijke reinigingsmiddelen en voedingsmiddelen. Gemaakt van duurzaam en voedselveilig HDPE-materiaal, biedt deze fles een uitstekende bescherming en gebruiksgemak voor zowel consumenten als fabrikanten.'
+    WHERE ID IN (81, 86, 91, 96);    
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Organische hennepzaadolie v', ID), picture_filepath = 'hennepzaadolie.jpg', omschrijving = "Gecertificeerd biologische hennepolie, rijke bron van plantaardig omega-3 (ALA) en GLA"
+    WHERE ID IN (83, 88, 93, 98);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Witte stoel v', ID), picture_filepath = 'stoel.jpg', omschrijving = "Deze comfortabele stoel maakt niet alleen indruk met zijn uitstekende ziteigenschappen, maar ook met zijn spannende materiaalmix. De zitschaal is gemaakt van stevig kunststof met kunstlederen bekleding of geheel van stof."
+    WHERE ID IN (84,89, 94, 99);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Waterglas v', ID), picture_filepath = 'waterglas.jpg', omschrijving = "Met dit sierlijke tumblerglas maak je een perfect ingedekte tafel af! Deze tumblerglazen zijn multifunctioneel, gebruik ze voor cocktails of sappen. Daarnaast zijn deze tumblers ook uitstekend te gebruiken als waterglas naast heerlijke wijn."
+    WHERE ID IN (85, 90, 95, 100);
+    `);
+
+    await connection.execute(`   
+    UPDATE producten
+    SET naam = CONCAT('Draadloze Presenter v', ID), picture_filepath = 'presenter.jpg', omschrijving = "Met de draadloze Presenter zet je jouw argumenten extra kracht bij. De knoppen voor diavoorstellingen zijn zo geplaatst dat u ze gemakkelijk op de tast kunt vinden om vol vertrouwen door uw presentaties te navigeren. De presenter biedt bovendien een rode laser die u helpt bij het aanwijzen tijdens het presenteren, een opbergbare plug-and-play draadloze ontvanger en de draadloze presenter heeft een bereik van ruim 15 meter."
+    WHERE ID IN (82, 87, 92, 97);
+    `);
+
     console.log("Product seeding executed successfully!");
     connection.end();
   } catch (error) {
