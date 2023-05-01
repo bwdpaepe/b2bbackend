@@ -3,13 +3,17 @@ import { AppDataSource } from "../data-source";
 import { Winkelmand } from "../entity/Winkelmand";
 import { WinkelmandProducten } from "../entity/WinkelmandProducten";
 import bedrijf from "./bedrijf";
+import Koa from "koa";
 import userservice from "../service/users";
+import productservice from '../service/product'
+import {Product} from "../entity/Product";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
 };
 
 const winkelmandRepo = AppDataSource.getRepository(Winkelmand);
+const winkelmandProductenRepo = AppDataSource.getRepository(WinkelmandProducten);
 /**
  * Check if the server is healthy.
  */
@@ -53,7 +57,30 @@ const seedWinkelmandOpAankopers = async () => {
   }
 };
 
+const testAddProduct = async (ctx: Koa.Context) => {
+  const winkelmand = await winkelmandRepo.findOne({where: {id : 1}});
+  const wmp = new WinkelmandProducten();
+  const product = await productservice.getProductByProductId(ctx);
+  console.log(JSON.stringify(product))
+
+  if (product instanceof Product) {
+    wmp.product = product;
+    await winkelmandProductenRepo.save(wmp);
+    winkelmand.winkelmandProducten.push(wmp);
+    await winkelmandRepo.save(winkelmand);
+    console.log("lol");
+  }
+
+  
+
+
+
+
+ 
+}
+
 export default {
   getWinkelmand,
   seedWinkelmandOpAankopers,
+  testAddProduct
 };

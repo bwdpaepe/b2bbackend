@@ -21,6 +21,13 @@ export const seedWinkelmandOpAankopers = async(ctx: Koa.Context) => {
   ctx.body = "succeeded"
 }
 
+export const testAddProduct = async(ctx: Koa.Context) => {
+  await winkelmandService.testAddProduct(ctx);
+
+  ctx.body = "succeeded"
+
+}
+
 
 
 export default function installWinkelmandRoutes(app: any) {
@@ -44,6 +51,13 @@ export default function installWinkelmandRoutes(app: any) {
         //authService.requireAuthentication,
         seedWinkelmandOpAankopers
       );
+
+      router.put(
+        "/addProduct",
+        //authService.requireAuthentication,
+        testAddProduct
+      );
+
 
 
   
