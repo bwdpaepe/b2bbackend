@@ -1,9 +1,8 @@
 import Router from "koa-router";
-import bedrijfService from "../service/bedrijf";
-import authService from "../service/auth"
+import authService from "../service/auth";
 import Koa from "koa";
 import { logger } from "../server";
-import winkelmandService from "../service/winkelmand"
+import winkelmandService from "../service/winkelmand";
 
 
 
@@ -16,16 +15,10 @@ export const getWinkelmand = async (ctx: Koa.Context) => {
 
 export const seedWinkelmandOpAankopers = async(ctx: Koa.Context) => {
   await winkelmandService.seedWinkelmandOpAankopers();
- 
-  
-  ctx.body = "succeeded"
 }
 
-export const testAddProduct = async(ctx: Koa.Context) => {
+export const AddProduct = async(ctx: Koa.Context) => {
   await winkelmandService.AddProduct(ctx);
-
-  
-
 }
 
 
@@ -55,7 +48,7 @@ export default function installWinkelmandRoutes(app: any) {
       router.put(
         "/addProduct/:product_id/:aantal",
         authService.requireAuthentication,
-        testAddProduct
+        AddProduct
       );
 
 

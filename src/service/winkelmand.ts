@@ -2,11 +2,9 @@ import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Winkelmand } from "../entity/Winkelmand";
 import { WinkelmandProducten } from "../entity/WinkelmandProducten";
-import bedrijf from "./bedrijf";
 import Koa from "koa";
 import userservice from "../service/users";
-import productservice from '../service/product'
-import {Product} from "../entity/Product";
+import { Product } from "../entity/Product";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);

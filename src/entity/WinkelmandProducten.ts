@@ -1,15 +1,9 @@
 import {
-    Column,
-    Entity,
-    JoinColumn,
-    JoinTable,
-    ManyToMany,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-    PrimaryGeneratedColumn,
-  } from "typeorm";
+  Column,
+  Entity,
+  JoinColumn, ManyToOne, PrimaryColumn,
+  PrimaryGeneratedColumn
+} from "typeorm";
 import { Product } from "./Product";
 import { Winkelmand } from "./Winkelmand";
 

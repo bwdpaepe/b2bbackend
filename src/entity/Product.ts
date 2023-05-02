@@ -3,11 +3,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Column,
-  JoinColumn,
-  ManyToMany,
+  JoinColumn
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
-import { Winkelmand } from "./Winkelmand";
 
 @Entity({ name: "producten" })
 export class Product {
