@@ -67,7 +67,9 @@ const AddProduct = async (ctx: Koa.Context) => {
     return ctx.status = 500, ctx.body = {error: "De gebruiker heeft geen beschikbare winkelmand, contacteer de site administrator"}
   }
   if (product) {
-
+    if(winkelmand.winkelmandProducten.filter(wmp => wmp.product_id === product.productId).length){
+      return ctx.status = 400, ctx.body = {error : "Dit product zit al reeds in je bestelling"}
+    }
     if (product.voorraad < aantal) {
       return ctx.status = 400, ctx.body = {error : "De voorraad van dit product is lager dan het gewenste aantal"}
     }
