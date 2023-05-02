@@ -64,7 +64,7 @@ const AddProduct = async (ctx: Koa.Context) => {
   const product = await productRepo.findOne({where: {productId : productId}});
 
   if(!winkelmand){
-    return ctx.status = 500, ctx.body = "De gebruiker heeft geen beschikbare winkelmand, contacteer de site administrator"
+    return ctx.status = 500, ctx.body = {error: "De gebruiker heeft geen beschikbare winkelmand, contacteer de site administrator"}
   }
   if (product) {
 
