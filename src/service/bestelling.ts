@@ -180,10 +180,39 @@ const postTrackAndTraceById = async (ctx: Koa.Context) => {
   
 };
 
+const checkBestellingExists = async (bestellingId: number) => {
+  const bestelling = await bestellingRepository.findOne({
+    where: {
+      bestellingId: bestellingId
+    }
+  });
+  if (bestelling) {
+    return true;
+  } else {
+      return false;
+  }
+};
+
+const getBedrijf = async (bestellingId: number) => {
+  return await bestellingRepository.findOne({
+    relations: {
+      leverancierBedrijf: false,
+      klantBedrijf: true,
+      aankoper: false,
+      transportdienst: false,
+      notification: false,
+    },
+    select: {klantBedrijf : {bedrijfId: true}},
+    where: {bestellingId: bestellingId}
+  });
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
   getById,
   getTrackAndTraceById,
-  postTrackAndTraceById
+  postTrackAndTraceById,
+  checkBestellingExists,
+  getBedrijf
 };

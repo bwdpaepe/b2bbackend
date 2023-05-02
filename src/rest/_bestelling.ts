@@ -39,7 +39,7 @@ export default function installBestellingRoutes(app: any) {
   // get bestelling by id
   // example http://localhost:9000/api/bestellingen/2
   //router.get("/bestellingId", authService.requireAuthentication, getBestellingById);
-  router.get("/:id", authService.requireAuthentication, authService.checkRolePermission(Functions.AANKOPER), getBestellingById);
+  router.get("/:id", authService.requireAuthentication, authService.checkRolePermission(Functions.AANKOPER), validateService.userCanAccessBestelling,getBestellingById);
 
   // get track & trace code
   // example http://localhost:9000/api/bestellingen/2/track-and-trace
