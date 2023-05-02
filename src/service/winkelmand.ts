@@ -68,7 +68,7 @@ const AddProduct = async (ctx: Koa.Context) => {
   }
   if (product) {
     if(winkelmand.winkelmandProducten.filter(wmp => wmp.product_id === product.productId).length){
-      return ctx.status = 400, ctx.body = {error : "Dit product zit al reeds in je bestelling"}
+      return ctx.status = 400, ctx.body = {error : "Dit product zit al reeds in je winkelmand"}
     }
     if (product.voorraad < aantal) {
       return ctx.status = 400, ctx.body = {error : "De voorraad van dit product is lager dan het gewenste aantal"}
