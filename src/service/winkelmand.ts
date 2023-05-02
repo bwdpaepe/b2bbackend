@@ -14,6 +14,7 @@ const debugLog = (message: any, meta = {}) => {
 
 const winkelmandRepo = AppDataSource.getRepository(Winkelmand);
 const winkelmandProductenRepo = AppDataSource.getRepository(WinkelmandProducten);
+const productRepo = AppDataSource.getRepository(Product);
 /**
  * Check if the server is healthy.
  */
@@ -57,30 +58,37 @@ const seedWinkelmandOpAankopers = async () => {
   }
 };
 
-const testAddProduct = async (ctx: Koa.Context) => {
-  const winkelmand = await winkelmandRepo.findOne({where: {id : 1}});
-  const wmp = new WinkelmandProducten();
-  const product = await productservice.getProductByProductId(ctx);
-  console.log(JSON.stringify(product))
+const AddProduct = async (ctx: Koa.Context) => {
+  const { userId } = ctx.state.session;
+  const productId = ctx.params.product_id;
+  const aantal = ctx.params.aantal;
+  const winkelmand = await winkelmandRepo.findOne({where: {user : {userId : userId}}, relations : {winkelmandProducten : true}});
+  const product = await productRepo.findOne({where: {productId : productId}});
 
-  if (product instanceof Product) {
-    wmp.product = product;
-    await winkelmandProductenRepo.save(wmp);
-    winkelmand.winkelmandProducten.push(wmp);
-    await winkelmandRepo.save(winkelmand);
-    console.log("lol");
+  if(!winkelmand){
+    return ctx.status = 500, ctx.body = "De gebruiker heeft geen beschikbare winkelmand, contacteer de site administrator"
   }
+  if (product) {
 
-  
+    if (product.voorraad < aantal) {
+      return ctx.status = 400, ctx.body = {error : "De voorraad van dit product is lager dan het gewenste aantal"}
+    }
+    const wmp = new WinkelmandProducten();
+    wmp.product = product;
+    wmp.winkelmand = winkelmand;
+    wmp.aantal = aantal;
+    await winkelmandProductenRepo.save(wmp);
+    ctx.status = 200;
+    return;
+  }
+  else{
+    return ctx.status = 404, ctx.body = {error : "Dit product bestaat niet"};
+  }  
 
-
-
-
- 
 }
 
 export default {
   getWinkelmand,
   seedWinkelmandOpAankopers,
-  testAddProduct
+  AddProduct
 };

@@ -12,16 +12,6 @@ export class foreignkeysWinkelmandproducten1682931009287 implements MigrationInt
             onUpdate: "CASCADE"
         }))
 
-        await queryRunner.createForeignKey("winkelmand", new TableForeignKey(       
-            {
-                name:"winkelmand_producten_id",
-                referencedTableName:"winkelmand_producten",
-                referencedColumnNames:["id"],
-                columnNames:["winkelmand_producten_id"],
-                onDelete: "CASCADE",
-                onUpdate: "CASCADE"
-            }
-        ))
 
         await queryRunner.createForeignKey("winkelmand_producten", new TableForeignKey(       
             {

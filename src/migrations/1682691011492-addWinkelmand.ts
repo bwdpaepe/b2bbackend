@@ -23,15 +23,7 @@ export class addWinkelmand1682691011492 implements MigrationInterface {
                             isNullable : false,
                             isUnique: true,
 
-                        },
-                        {
-                            name : "winkelmand_producten_id",
-                            type: "BIGINT",
-                            isNullable : true,
-                            isUnique: true,
-
                         }
-
                     ]                    
                 }
             )
