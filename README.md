@@ -35,7 +35,13 @@ De volgende software dient reeds geïnstalleerd is:
 - installatie van de dependencies via dit commando: **npm i** <br />
 - starten van de webservice via dit commando: **npm run start** <br />
 
-
 ## Online adres van de webservice
 
 [https://sdp2t03-webservice.onrender.com/api/health/ping](https://sdp2t03-webservice.onrender.com/api/health/ping)
+
+## Info migrations
+
+Een migration-file wordt gecreëert door de CLI 'npx typeorm migration:create ./src/migrations/<KIES UW NAAM>'
+Voeg daarna deze klasse toe in de migration-data-source.ts en run het script 'npm run migration'
+Vul zeker ook de public async down const in! dat is het omgekeerde van de up. (zie het als een rollback manier)
+TypeORM voegt dan een timestamp toe aan de migratie, deze zal maar 1 keer uitgevoerd worden, ongeacht hoe vaak je de migration command uitvoert (tenzij je het revert hebt op een bepaald punt)

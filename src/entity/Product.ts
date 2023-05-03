@@ -3,7 +3,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Column,
-  JoinColumn,
+  JoinColumn
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
 
@@ -12,7 +12,7 @@ export class Product {
   @PrimaryGeneratedColumn({ name: "ID" })
   productId: number;
 
-  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products)
+  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products, {onDelete: "NO ACTION", onUpdate: "NO ACTION"})
   @JoinColumn({ name: "LEVERANCIER_ID" })
   bedrijf: Bedrijf;
 
@@ -33,4 +33,7 @@ export class Product {
 
   @Column({ name: "omschrijving", type: "text" })
   omschrijving: string;
+
+  @Column({ name: "levertermijn", type: "int" })
+  levertermijn: number;
 }

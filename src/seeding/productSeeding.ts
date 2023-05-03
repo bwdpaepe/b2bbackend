@@ -67,6 +67,15 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
   WHERE id > 0;
   `);
 
+    await connection.execute(`UPDATE producten SET levertermijn = 
+    CASE id % 3
+      WHEN 0 THEN 1
+      WHEN 1 THEN 2
+      WHEN 2 THEN 3
+    END
+  WHERE id > 0;
+  `);
+
     //Leverancier 1
     await connection.execute(`   
     UPDATE producten

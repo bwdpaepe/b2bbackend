@@ -10,6 +10,7 @@ import installNotificationRoutes from "./_notification";
 import installSessionRoutes from "./_session";
 import installProductRoutes from "./_product";
 import installBestellingRoutes from "./_bestelling";
+import installWinkelmandRoutes from "./_winkelmand";
 
 /**
  * Install all routes in the given Koa application.
@@ -29,6 +30,7 @@ export default (app: Koa) => {
   installSessionRoutes(router);
   installProductRoutes(router);
   installBestellingRoutes(router);
+  installWinkelmandRoutes(router);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.info(`Installation of all REST routes completed`);

@@ -8,6 +8,8 @@ import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
 import { Product } from "./entity/Product";
+import { Winkelmand } from "./entity/Winkelmand";
+import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { Transportdienst } from "./entity/Transportdienst";
 import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
 
@@ -20,7 +22,7 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [Bedrijf, User, Bestelling, Product, Notification, Session, Transportdienst, TrackAndTraceFormat],
+  entities: [Bedrijf, User, Bestelling, Product, Notification, Session, Winkelmand, WinkelmandProducten, Transportdienst, TrackAndTraceFormat],
   migrations: [],
   subscribers: [],
 });
