@@ -26,4 +26,7 @@ export class WinkelmandProducten{
 
     @Column({name: "aantal"})
     aantal: number;
+
+    // transient property subtotaal
+    subtotal: number;
 }
