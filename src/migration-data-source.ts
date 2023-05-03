@@ -25,5 +25,5 @@ export default new DataSource({
   synchronize: false,
   logging: false,
   entities: [Bedrijf, User, Bestelling, Notification, Session, Product, Winkelmand, WinkelmandProducten],
-  migrations: [addWinkelmand1682691011492, addWinkelmandProducten1682848647253, foreignkeysWinkelmandproducten1682931009287],
+  migrations: [AddSessions1681898251992, AlterProducts1682016268609, addWinkelmand1682691011492, addWinkelmandProducten1682848647253, foreignkeysWinkelmandproducten1682931009287],
 });

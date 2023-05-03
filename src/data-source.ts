@@ -19,7 +19,7 @@ export const AppDataSource = new DataSource({
   password: config.database.password,
   database: config.database.database,
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [Bedrijf, User, Bestelling, Product, Notification, Session, Winkelmand, WinkelmandProducten],
   migrations: [],
   subscribers: [],
