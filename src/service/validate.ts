@@ -3,7 +3,6 @@ import { ZodError} from "zod";
 
 import { logger } from "../server";
 import authService from "./auth";
-import { Bestelling } from "../entity/Bestelling";
 import bestellingService from "../service/bestelling"
 
 const debugLog = (message: any, meta = {}) => {
@@ -22,12 +21,15 @@ const userCanAccessBestelling = async (ctx: any, next: any) => {
     debugLog(
       "GET bedrijf for a specific bestelling with id: " + bestellingId
     );
-    if(bestellingService.checkBestellingExists(bestellingId)) {
+    if(await bestellingService.checkBestellingExists(bestellingId)) {
       const checkBedrijfId = await bestellingService.getBedrijf(bestellingId);
       console.log(checkBedrijfId);
       if(checkBedrijfId.klantBedrijf.bedrijfId !== bedrijfId) {
         throw new Error('bestelling kan niet opgehaald worden');
       }
+    }
+    else {
+      return (ctx.status = 404), (ctx.body = {error: "bestelling niet gevonden"});
     }
     
   }catch (error: any) {
@@ -39,12 +41,14 @@ const userCanAccessBestelling = async (ctx: any, next: any) => {
 
 const validateTrackAndTrace = (ctx: any, next: any) => {
   try{
-    const result = TrackAndTraceSchema.parse(ctx.request.body);
+    const{ttc, verify} = ctx.query;
+    const querySchema = {ttc: ttc, verify: verify};
+    const result = TrackAndTraceSchema.parse(querySchema);
     console.log(result);
   }
   catch (error: any) {
     if (error instanceof ZodError) {
-      return (ctx.status = 403), (ctx.body = { error: JSON.stringify(error.issues.map((issue) => ({ message: issue.message }))) }); // 403 = Invalid format
+      return (ctx.status = 403), (ctx.body = { error: ([error.issues.map((issue) => (issue.message))]).join(',') }); // 403 = Invalid format
     }
     return (ctx.status = 400), (ctx.body = { error: error.message }); // 400 = Bad request
   }

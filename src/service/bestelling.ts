@@ -86,94 +86,50 @@ const getById = async (ctx: Koa.Context) => {
   
 };
 
-async function findOneBestelling(bestellingId: number) {
-  //const bestelling: Bestelling = 
-  return (await bestellingRepository.findOne({
-    relations: {
-      leverancierBedrijf: false,
-      klantBedrijf: false,
-      aankoper: false,
-      transportdienst: {
-        trackAndTraceFormat: true,
-      },
-      notification: true,
-    },
-    select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}, notification : {creationDate: true}},
-    where: {bestellingId: bestellingId}}));
-}
-
-// GET track and trace by ID
-const getTrackAndTraceById = async (ctx: Koa.Context) => {
-  const bestellingId = ctx.params.id;
-  debugLog("ophalen track and trace met Id " + bestellingId);
-  try{
-    if(bestellingId){
-      const bestelling: Bestelling = await findOneBestelling(bestellingId);
-
-        if (!bestelling) {
-          debugLog("geen bestelling gevonden met Id: " + bestellingId);
-          return (ctx.status = 204);
-        }
-
-        return {...bestelling, status: BestellingStatus[bestelling.status]};
-    }
-    else{
-      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
-    }
-  } catch (error: any) {
-    return (ctx.status = 400), (ctx.body = { error: error.message });
+// GET bestelling by track and trace
+const getByTrackAndTrace = async (ctx: any) => {
+  const { ttc, verify } = ctx.query;
+  if (!ttc || !verify) {
+    return (ctx.status = 400), (ctx.body = { error: "Invalid query values" });
   }
-  
-};
 
-// GET track and trace by ID
-const postTrackAndTraceById = async (ctx: Koa.Context) => {
-  const bestellingId = ctx.params.id;
-  debugLog("ophalen track and trace met Id " + bestellingId);
+  debugLog("ophalen bestelling met TTC " + ttc);
   try{
-    if(bestellingId){
-      const bestelling: Bestelling = await findOneBestelling(bestellingId);
+    
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: false,
+          klantBedrijf: false,
+          aankoper: false,
+          transportdienst: {
+            trackAndTraceFormat: true,
+          },
+          notification: true,
+        },
+        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}, notification : {creationDate: true}},
+        where: {trackAndTraceCode: ttc}});
         if (!bestelling) {
-          debugLog("geen bestelling gevonden met Id: " + bestellingId);
+          debugLog("geen bestelling gevonden met TTC: " + ttc);
           return (ctx.status = 204);
         }
 
         // verify the input
-        const {
-          trackAndTrace,
-          verification
-        } = (ctx.request.body as {trackAndTrace: string, verification: string});
-        
-        const errorMessage: string[] = [];
-        
-        // trackandtrace
-        if(!(trackAndTrace === bestelling.trackAndTraceCode)) {
-          errorMessage.push("track and trace code is verkeerd");
-        }
-
-        // verification
         switch (bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring) {
           case 'POSTCODE':
-            if(!(verification === bestelling.leveradresPostcode)) {
-              errorMessage.push("verificatie is verkeerd");
+            if(verify !== bestelling.leveradresPostcode) {
+              return(ctx.status = 404),(ctx.body = {error : "verificatie is verkeerd"});
             }
             break;
           case 'ORDERID':
-            if(!(verification === bestelling.orderId)) {
-              errorMessage.push("verificatie is verkeerd");
+            if(verify !== bestelling.orderId) {
+              return(ctx.status = 404),(ctx.body = {error : "verificatie is verkeerd"});
             }
             break;
         }
 
-        if(errorMessage.length !== 0) {
-          return(ctx.status = 404),(ctx.body = {error : errorMessage.toString()});  // 404: not found
-        }
-
         return {...bestelling, status: BestellingStatus[bestelling.status]};
-    }
-    else{
-      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
-    }
+    
+    
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
@@ -186,10 +142,11 @@ const checkBestellingExists = async (bestellingId: number) => {
       bestellingId: bestellingId
     }
   });
-  if (bestelling) {
-    return true;
+  if (bestelling == null) {
+    return false;
   } else {
-      return false;
+    
+      return true;
   }
 };
 
@@ -211,8 +168,7 @@ export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
   getById,
-  getTrackAndTraceById,
-  postTrackAndTraceById,
+  getByTrackAndTrace,
   checkBestellingExists,
   getBedrijf
 };
