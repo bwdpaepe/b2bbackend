@@ -25,4 +25,6 @@ export class Winkelmand {
   winkelmandProducten: WinkelmandProducten[];
 
   totalPrice: any[]; // array of { bedrijfId: number, value: number }, see src\service\winkelmand.ts
+
+  levertermijn: number; // max levertermijn of all products in winkelmand
 }

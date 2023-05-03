@@ -42,6 +42,7 @@ const getWinkelmand = async (ctx: Koa.Context) => {
           voorraad: true,
           pictureFilename: true,
           omschrijving: true,
+          levertermijn: true,
         },
       },
     },
@@ -72,14 +73,22 @@ const getWinkelmand = async (ctx: Koa.Context) => {
 
     if (currentTotal) {
       currentTotal.value += winkelmandProduct.subtotal;
+      currentTotal.levertermijn = Math.max(currentTotal.levertermijn, winkelmandProduct.product.levertermijn);
     } else {
-      accumulator.push({ bedrijfId, value: winkelmandProduct.subtotal });
+      accumulator.push(
+        { bedrijfId, 
+          value: winkelmandProduct.subtotal,
+          levertermijn: winkelmandProduct.product.levertermijn,
+         });
     }
     return accumulator;
   }, []); // Start with an empty array
 
+
   return winkelmand;
 };
+
+
 
 const seedWinkelmandOpAankopers = async () => {
   const users = await userservice.getAllUsers();

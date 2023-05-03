@@ -22,7 +22,7 @@ export class AlterProducts1682016268609 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumns("produten", [
+    await queryRunner.dropColumns("producten", [
       new TableColumn({
         name: "voorraad",
         type: "integer",
