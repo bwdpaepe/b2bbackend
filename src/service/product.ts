@@ -3,7 +3,7 @@ import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Product } from "../entity/Product";
 
-const debugLog = (message: any, meta = {}) => {
+const debugLog = (message: any) => {
   logger.debug(message);
 };
 
@@ -21,8 +21,8 @@ const checkProductEndpoint = async () => {
 
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
-    const bedrijfId = Number(ctx.query.bedrijfId);
+    debugLog("GET producten with bedrijfId " + ctx.params.bedrijfId);
+    const bedrijfId = Number(ctx.params.bedrijfId);
 
     if (!bedrijfId) {
       throw new Error("No correct bedrijfId was provided");
@@ -32,11 +32,9 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       where: { bedrijf: { bedrijfId: bedrijfId } },
     });
 
-    if (!products || !products.length) {
-      return (
-        (ctx.status = 204),
-        (ctx.body = { error: "No products found for bedrijfId " + bedrijfId })
-      );
+    if (!products || products.length === 0) {
+      debugLog("No products found for company with Id:  " + bedrijfId);
+      return (ctx.status = 204);
     }
 
     return products;
@@ -45,7 +43,33 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   }
 };
 
+const getProductByProductId = async (ctx: Koa.Context) => {
+  try {
+    debugLog("GET product with productId " + ctx.params.productId);
+    const productId = Number(ctx.params.productId);
+
+
+    if (!productId) {
+      throw new Error("No correct productId was provided");
+    }
+
+    const product = await productRepository.findOne({
+      where: { productId: productId },
+    });
+
+    if (!product) {
+      debugLog("No product found with Id: " + productId);
+      return (ctx.status = 204);
+    }
+
+    return product;
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
+
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
+  getProductByProductId,
 };
