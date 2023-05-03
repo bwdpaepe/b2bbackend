@@ -32,18 +32,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       where: { bedrijf: { bedrijfId: bedrijfId } },
     });
 
-    if (!products) {
-      return (
-        (ctx.status = 404),
-        (ctx.body = {
-          error:
-            "There went something wrong when loading products from company with Id:  " +
-            bedrijfId,
-        })
-      );
-    }
-
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
       debugLog("No products found for company with Id:  " + bedrijfId);
       return (ctx.status = 204);
     }
@@ -58,6 +47,7 @@ const getProductByProductId = async (ctx: Koa.Context) => {
   try {
     debugLog("GET product with productId " + ctx.params.productId);
     const productId = Number(ctx.params.productId);
+
 
     if (!productId) {
       throw new Error("No correct productId was provided");
