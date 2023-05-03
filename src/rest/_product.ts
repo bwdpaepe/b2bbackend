@@ -21,10 +21,6 @@ export default function installProductRoutes(app: any) {
     ctx.body = await productService.getAllProductsByBedrijfId(ctx);
   };
 
-  const getProductByProductId = async (ctx: Koa.Context) => {
-    ctx.body = await productService.getProductByProductId(ctx);
-  };
-
   /**
    * PUBLIC ROUTES
    */
@@ -33,12 +29,8 @@ export default function installProductRoutes(app: any) {
   router.get("/test", checkProductEndpoint);
 
   // GET all products by 'bedrijfId'
-  // example http://localhost:9000/api/products/bedrijven/1
-  router.get("/bedrijven/:bedrijfId", getAllProductsByBedrijfId);
-
-  //GET product by 'productId'
-  // example http://localhost:9000/api/products/1
-  router.get("/:productId", getProductByProductId);
+  // example http://localhost:9000/api/products/bedrijfId?bedrijfId=2
+  router.get("/bedrijfId", getAllProductsByBedrijfId);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of Product Routes (_product.ts) completed`);
