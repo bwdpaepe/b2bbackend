@@ -8,9 +8,9 @@ import winkelmandService from "../service/winkelmand";
 
 
 
-// GET bedrijf by 'bedrijfId'
+// GET winkelmand van ingelogde gebruiker
 export const getWinkelmand = async (ctx: Koa.Context) => {
-    ctx.body = await  winkelmandService.getWinkelmand();
+    ctx.body = await  winkelmandService.getWinkelmand(ctx);
   };
 
 export const seedWinkelmandOpAankopers = async(ctx: Koa.Context) => {
@@ -35,7 +35,7 @@ export default function installWinkelmandRoutes(app: any) {
 
     router.get(
         "/",
-        //authService.requireAuthentication,
+        authService.requireAuthentication,
         getWinkelmand
       );
 

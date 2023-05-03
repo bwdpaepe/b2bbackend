@@ -33,4 +33,7 @@ export class Product {
 
   @Column({ name: "omschrijving", type: "text" })
   omschrijving: string;
+
+  @Column({ name: "levertermijn", type: "int" })
+  levertermijn: number;
 }
