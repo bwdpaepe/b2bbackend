@@ -14,6 +14,8 @@ import { AddProductLevertermijn1683121543029 } from "./migrations/1683121543029-
 import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { foreignkeysWinkelmandproducten1682931009287 } from "./migrations/1682931009287-foreignkeysWinkelmandproducten";
+import { addCategorie1683214196556 } from "./migrations/1683214196556-addCategorie";
+import { Categorie } from "./entity/Categorie";
 
 export default new DataSource({
   type: "mysql",
@@ -33,6 +35,7 @@ export default new DataSource({
     Product,
     Winkelmand,
     WinkelmandProducten,
+    Categorie,
   ],
   migrations: [
     AddSessions1681898251992,
@@ -41,5 +44,6 @@ export default new DataSource({
     addWinkelmandProducten1682848647253,
     foreignkeysWinkelmandproducten1682931009287,
     AddProductLevertermijn1683121543029,
+    addCategorie1683214196556,
   ],
 });

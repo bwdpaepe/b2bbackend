@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
+import { Categorie } from "./Categorie";
 
 @Entity({ name: "producten" })
 export class Product {
@@ -18,6 +19,13 @@ export class Product {
   })
   @JoinColumn({ name: "LEVERANCIER_ID" })
   bedrijf: Bedrijf;
+
+  @ManyToOne(() => Categorie, (categorie) => categorie.producten, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn({ name: "categorie_id" })
+  categorie: Categorie;
 
   @Column({ name: "NAAM", length: 255, unique: true })
   naam: string;
