@@ -30,6 +30,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
+      relations: ["categorie"],
     });
 
     if (!products || products.length === 0) {
@@ -48,13 +49,13 @@ const getProductByProductId = async (ctx: Koa.Context) => {
     debugLog("GET product with productId " + ctx.params.productId);
     const productId = Number(ctx.params.productId);
 
-
     if (!productId) {
       throw new Error("No correct productId was provided");
     }
 
     const product = await productRepository.findOne({
       where: { productId: productId },
+      relations: ["categorie"],
     });
 
     if (!product) {

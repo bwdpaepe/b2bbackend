@@ -18,6 +18,7 @@ import { addCategorie1683221364822 } from "./migrations/1683221364822-addCategor
 import { Categorie } from "./entity/Categorie";
 import { relationBedrijfCategorie1683221414398 } from "./migrations/1683221414398-relationBedrijfCategorie";
 import { categorieSeeding1683221473794 } from "./migrations/1683221473794-categorieSeeding";
+import { seedBedrijfCategorieTable1683225889624 } from "./migrations/1683225889624-seedBedrijfCategorieTable";
 
 export default new DataSource({
   type: "mysql",
@@ -49,5 +50,6 @@ export default new DataSource({
     addCategorie1683221364822,
     relationBedrijfCategorie1683221414398,
     categorieSeeding1683221473794,
+    seedBedrijfCategorieTable1683225889624,
   ],
 });

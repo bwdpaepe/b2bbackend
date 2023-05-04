@@ -232,47 +232,47 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     `);
 
     //TODO string vervangen door de juiste categorie ID
-    /* await connection.execute(`
+    await connection.execute(`
     UPDATE producten
-    SET categorie = 'Elektronica'
+    SET categorie_id = '7'
     WHERE ID IN (3, 8, 13, 18, 4, 9, 14, 19, 22, 27, 32, 37, 61, 66, 71, 76, 82, 87, 92, 97);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Verzorgingsproducten'
+    SET categorie_id = '6'
     WHERE ID IN (5, 10, 15, 20, 1, 6, 11, 16, 24, 29, 34, 39, 41, 46, 51, 56, 64, 69, 74, 79, 83, 88, 93, 98);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Glazen'
+    SET categorie_id = '5'
     WHERE ID IN (21, 26, 31, 36, 62, 67, 72, 77, 81, 86, 91, 96, 85, 90, 95, 100);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Decoratie'
+    SET categorie_id = '4'
     WHERE ID IN (2, 7, 12, 17, 43, 48, 53, 58, 44, 49, 54, 59, 63, 68, 73, 78);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Drank'
+    SET categorie_id = '3'
     WHERE ID IN (23, 28, 33, 38);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Kantoorbenodigdheden'
+    SET categorie_id = '2'
     WHERE ID IN (65, 70, 75, 80, 84,89, 94, 99);
     `);
 
     await connection.execute(`
     UPDATE producten
-    SET categorie = 'Kleding'
+    SET categorie_id = '1'
     WHERE ID IN (25, 30, 35, 40, 45, 50, 55, 60, 42, 47, 52, 57);
-    `);*/
+    `);
 
     console.log("Product seeding executed successfully!");
     connection.end();
