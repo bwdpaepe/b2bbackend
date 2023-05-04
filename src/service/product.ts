@@ -89,7 +89,9 @@ const getAllProductCategoriesByBedrijfId = async (ctx: Koa.Context) => {
     });
 
     if (!categories || categories.size === 0) {
-      debugLog("No categories were found for company with Id:  " + bedrijfId);
+      debugLog(
+        "No product categories were found for company with Id:  " + bedrijfId
+      );
       return (ctx.status = 204);
     }
 
