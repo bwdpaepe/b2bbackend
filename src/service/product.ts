@@ -71,7 +71,7 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 
 const getAllProductCategoriesByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET producten with bedrijfId " + ctx.params.bedrijfId);
+    debugLog("GET product categories with bedrijfId " + ctx.params.bedrijfId);
     const bedrijfId = Number(ctx.params.bedrijfId);
 
     if (!bedrijfId) {
@@ -83,14 +83,16 @@ const getAllProductCategoriesByBedrijfId = async (ctx: Koa.Context) => {
       relations: ["categorie"],
     });
 
-    if (!products || products.length === 0) {
-      debugLog("No products found for company with Id:  " + bedrijfId);
-      return (ctx.status = 204);
-    }
     const categories: Set<string> = new Set();
     products.forEach((product) => {
       categories.add(product.categorie.naam);
     });
+
+    if (!categories || categories.size === 0) {
+      debugLog("No categories were found for company with Id:  " + bedrijfId);
+      return (ctx.status = 204);
+    }
+
     return Array.from(categories);
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
