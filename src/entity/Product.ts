@@ -39,7 +39,4 @@ export class Product {
 
   @Column({ name: "levertermijn", type: "int" })
   levertermijn: number;
-
-  @Column({ name: "categorie", type: "varchar", length: 255 })
-  categorie: string;
 }

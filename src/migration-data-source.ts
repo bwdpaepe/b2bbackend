@@ -11,7 +11,6 @@ import { DataSource } from "typeorm";
 import { addWinkelmand1682691011492 } from "./migrations/1682691011492-addWinkelmand";
 import { addWinkelmandProducten1682848647253 } from "./migrations/1682848647253-addWinkelmandProducten";
 import { AddProductLevertermijn1683121543029 } from "./migrations/1683121543029-AddProductLevertermijn";
-import { AddProductCategory1683208846665 } from "./migrations/1683208846665-AddProductCategory";
 import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { foreignkeysWinkelmandproducten1682931009287 } from "./migrations/1682931009287-foreignkeysWinkelmandproducten";
@@ -42,6 +41,5 @@ export default new DataSource({
     addWinkelmandProducten1682848647253,
     foreignkeysWinkelmandproducten1682931009287,
     AddProductLevertermijn1683121543029,
-    AddProductCategory1683208846665,
   ],
 });
