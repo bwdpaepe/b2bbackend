@@ -71,13 +71,13 @@ const getById = async (ctx: Koa.Context) => {
 
         if (!bestelling) {
           debugLog("geen bestelling gevonden met Id: " + bestellingId);
-          return (ctx.status = 204);
+          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
         }
 
         return {...bestelling, status: BestellingStatus[bestelling.status]};
     }
     else {
-      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van de bestelling"});
+      return(ctx.status = 404),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
     }
 
   } catch (error: any) {
@@ -110,21 +110,22 @@ const getByTrackAndTrace = async (ctx: any) => {
         where: {trackAndTraceCode: ttc}});
         if (!bestelling) {
           debugLog("geen bestelling gevonden met TTC: " + ttc);
-          return (ctx.status = 204);
+          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
         }
 
         // verify the input
         switch (bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring) {
           case 'POSTCODE':
             if(verify !== bestelling.leveradresPostcode) {
-              return(ctx.status = 404),(ctx.body = {error : "verificatie is verkeerd"});
+              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
             }
             break;
           case 'ORDERID':
             if(verify !== bestelling.orderId) {
-              return(ctx.status = 404),(ctx.body = {error : "verificatie is verkeerd"});
+              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
             }
             break;
+          default: return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
         }
 
         return {...bestelling, status: BestellingStatus[bestelling.status]};
