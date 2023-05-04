@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+} from "typeorm";
 import { Product } from "./Product";
+import { Bedrijf } from "./Bedrijf";
 
 @Entity({ name: "categorie" })
 export class Categorie {
@@ -14,4 +21,7 @@ export class Categorie {
     onUpdate: "NO ACTION",
   })
   producten: Product[];
+
+  @ManyToMany(() => Bedrijf, (bedrijf) => bedrijf.categorieën)
+  bedrijven: Bedrijf[];
 }

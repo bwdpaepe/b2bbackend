@@ -1,7 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import { Bestelling } from "./Bestelling";
 import { User } from "./User";
 import { Product } from "./Product";
+import { Categorie } from "./Categorie";
 
 @Entity({ name: "BEDRIJF" })
 export class Bedrijf {
@@ -19,6 +27,10 @@ export class Bedrijf {
 
   @OneToMany(() => Product, (product) => product.bedrijf)
   products: Product[];
+
+  @ManyToMany(() => Categorie)
+  @JoinTable()
+  categorieën: Categorie[];
 
   @Column({
     name: "NAAM",

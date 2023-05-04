@@ -231,18 +231,6 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     WHERE ID IN (82, 87, 92, 97);
     `);
 
-    await connection.execute(`
-      INSERT INTO categorie (naam)
-      VALUES
-        ('Kleding'),
-        ('Kantoorbenodigdheden'),
-        ('Drank'),
-        ('Decoratie'),
-        ('Glazen'),
-        ('Verzorgingsproducten'),
-        ('Elektronica')
-`);
-
     //TODO string vervangen door de juiste categorie ID
     /* await connection.execute(`
     UPDATE producten

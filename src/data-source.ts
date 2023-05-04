@@ -10,6 +10,7 @@ import { Session } from "./entity/Session";
 import { Product } from "./entity/Product";
 import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
+import { Categorie } from "./entity/Categorie";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -20,7 +21,17 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [Bedrijf, User, Bestelling, Product, Notification, Session, Winkelmand, WinkelmandProducten],
+  entities: [
+    Bedrijf,
+    User,
+    Bestelling,
+    Product,
+    Notification,
+    Session,
+    Winkelmand,
+    WinkelmandProducten,
+    Categorie,
+  ],
   migrations: [],
   subscribers: [],
 });
