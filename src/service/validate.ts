@@ -11,12 +11,7 @@ const debugLog = (message: any, meta = {}) => {
 
 const userCanAccessBestelling = async (ctx: any, next: any) => {
   try {
-    const JWTUserInfo = await authService.checkAndParseSession(
-      ctx.headers.authorization
-    );
-    console.log(JWTUserInfo);
-    const JWTuserId = JWTUserInfo.userId;
-    const bedrijfId = JWTUserInfo.bedrijfId;
+    const {bedrijfId} = ctx.state.session;
     const bestellingId = ctx.params.id;
     debugLog(
       "GET bedrijf for a specific bestelling with id: " + bestellingId

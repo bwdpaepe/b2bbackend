@@ -37,11 +37,11 @@ export default function installBestellingRoutes(app: any) {
    * PROTECTED ROUTES
    */
   // get all bestellingen van bedrijf van aangemelde aankoper
-  router.get("/", authService.requireAuthentication, authService.checkRolePermission(Functions.AANKOPER), getBestellingen);
+  router.get("/", authService.requireAuthentication, getBestellingen);
 
   // get bestelling by id
   // example http://localhost:9000/api/bestellingen/2
-  router.get("/:id", authService.requireAuthentication, authService.checkRolePermission(Functions.AANKOPER), validateService.userCanAccessBestelling, getBestellingById);
+  router.get("/:id", authService.requireAuthentication, validateService.userCanAccessBestelling, getBestellingById);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of bestellingen Route (_bestelling.ts) completed`);
