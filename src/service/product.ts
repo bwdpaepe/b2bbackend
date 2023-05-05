@@ -69,41 +69,8 @@ const getProductByProductId = async (ctx: Koa.Context) => {
   }
 };
 
-const getAllProductCategoriesByBedrijfId = async (ctx: Koa.Context) => {
-  try {
-    debugLog("GET product categories with bedrijfId " + ctx.params.bedrijfId);
-    const bedrijfId = Number(ctx.params.bedrijfId);
-
-    if (!bedrijfId) {
-      throw new Error("No correct bedrijfId was provided");
-    }
-
-    const products = await productRepository.find({
-      where: { bedrijf: { bedrijfId: bedrijfId } },
-      relations: ["categorie"],
-    });
-
-    const categories: Set<string> = new Set();
-    products.forEach((product) => {
-      categories.add(product.categorie.naam);
-    });
-
-    if (!categories || categories.size === 0) {
-      debugLog(
-        "No product categories were found for company with Id:  " + bedrijfId
-      );
-      return (ctx.status = 204);
-    }
-
-    return Array.from(categories);
-  } catch (error: any) {
-    return (ctx.status = 400), (ctx.body = { error: error.message });
-  }
-};
-
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
   getProductByProductId,
-  getAllProductCategoriesByBedrijfId,
 };
