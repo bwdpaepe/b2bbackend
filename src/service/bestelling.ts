@@ -151,7 +151,7 @@ const checkBestellingExists = async (bestellingId: number) => {
   }
 };
 
-const getBedrijf = async (bestellingId: number) => {
+const getBedrijfIdFromBestelling = async (bestellingId: number) => {
   return await bestellingRepository.findOne({
     relations: {
       leverancierBedrijf: false,
@@ -171,5 +171,5 @@ export default {
   getById,
   getByTrackAndTrace,
   checkBestellingExists,
-  getBedrijf
+  getBedrijfIdFromBestelling
 };

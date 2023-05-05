@@ -17,7 +17,7 @@ const userCanAccessBestelling = async (ctx: any, next: any) => {
       "GET bedrijf for a specific bestelling with id: " + bestellingId
     );
     if(await bestellingService.checkBestellingExists(bestellingId)) {
-      const checkBedrijfId = await bestellingService.getBedrijf(bestellingId);
+      const checkBedrijfId = await bestellingService.getBedrijfIdFromBestelling(bestellingId);
       console.log(checkBedrijfId);
       if(checkBedrijfId.klantBedrijf.bedrijfId !== bedrijfId) {
         throw new Error('bestelling kan niet opgehaald worden');
