@@ -4,8 +4,6 @@ import { AppDataSource } from "../data-source";
 import { Bedrijf } from "../entity/Bedrijf";
 import { User } from "../entity/User";
 
-
-
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
 };
@@ -38,9 +36,9 @@ const getAllBedrijf = async () => {
 const getBedrijfProfiel = async (ctx: any) => {
   try {
     //bedrijfId halen uit de token
-    const {bedrijfId} = ctx.state.session ;
-    let bedrijf : Bedrijf;
-    if(bedrijfId){
+    const { bedrijfId } = ctx.state.session;
+    let bedrijf: Bedrijf;
+    if (bedrijfId) {
       debugLog("getting company profile " + bedrijfId);
       //bedrijfsgegevens ophalen uit db op basis van bedrijfId in de token
       bedrijf = await bedrijfRepository.findOne({
@@ -58,7 +56,7 @@ const getBedrijfProfiel = async (ctx: any) => {
         },
       });
     }
-    debugLog(JSON.stringify(bedrijf))
+    debugLog(JSON.stringify(bedrijf));
     if (bedrijf) {
       return bedrijf;
     } else {
@@ -66,10 +64,12 @@ const getBedrijfProfiel = async (ctx: any) => {
         (ctx.status = 404), (ctx.body = { error: "Dit bedrijf bestaat niet" })
       );
     }
-  } catch (error : any) {
+  } catch (error: any) {
     return (
       (ctx.status = 400),
-      (ctx.body = { error: "Er ging iets mis bij het laden van het profiel" + error.message })
+      (ctx.body = {
+        error: "Er ging iets mis bij het laden van het profiel" + error.message,
+      })
     );
   }
 };
@@ -93,11 +93,30 @@ const getBedrijfById = async (ctx: Koa.Context) => {
   }
 };
 
+/**
+ * Get bedrijfcategorieën via bedrijfId
+ */
+const getBedrijfCategoriesById = async (ctx: Koa.Context) => {
+  debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
+  try {
+    const bedrijf = await bedrijfRepository.findOne({
+      where: { bedrijfId: Number(ctx.params.bedrijfId) },
+      relations: { categorie: true },
+    });
 
+    if (!bedrijf) {
+      throw new Error("Bedrijf with id " + ctx.params.bedrijfId + " not found");
+    }
+    return bedrijf.categorie;
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
 
 export default {
   checkBedrijfEndpoint,
   getAllBedrijf,
   getBedrijfById,
   getBedrijfProfiel,
+  getBedrijfCategoriesById,
 };

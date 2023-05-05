@@ -22,6 +22,6 @@ export class Categorie {
   })
   producten: Product[];
 
-  @ManyToMany(() => Bedrijf, (bedrijf) => bedrijf.categorieën)
+  @ManyToMany(() => Bedrijf, (bedrijf) => bedrijf.categorie)
   bedrijven: Bedrijf[];
 }

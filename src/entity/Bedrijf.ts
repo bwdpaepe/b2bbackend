@@ -29,8 +29,18 @@ export class Bedrijf {
   products: Product[];
 
   @ManyToMany(() => Categorie)
-  @JoinTable()
-  categorieën: Categorie[];
+  @JoinTable({
+    name: "bedrijf_categorie",
+    joinColumn: {
+      name: "bedrijfId",
+      referencedColumnName: "bedrijfId",
+    },
+    inverseJoinColumn: {
+      name: "categorieId",
+      referencedColumnName: "categoryId",
+    },
+  })
+  categorie: Categorie[];
 
   @Column({
     name: "NAAM",
