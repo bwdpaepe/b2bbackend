@@ -97,7 +97,7 @@ const getBedrijfById = async (ctx: Koa.Context) => {
  * Get bedrijfcategorieën via bedrijfId
  */
 const getBedrijfCategoriesById = async (ctx: Koa.Context) => {
-  debugLog("GET bedrijf with bedrijfId " + ctx.query.bedrijfId);
+  debugLog("GET bedrijf with bedrijfId " + ctx.params.bedrijfId);
   try {
     const bedrijf = await bedrijfRepository.findOne({
       where: { bedrijfId: Number(ctx.params.bedrijfId) },
