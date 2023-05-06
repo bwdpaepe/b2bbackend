@@ -9,6 +9,7 @@ import {
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
 import { Bedrijf } from "./Bedrijf";
 import { Notification } from "./Notification";
+import { Transportdienst } from "./Transportdienst";
 import { User } from './User';
 
 @Entity({ name: "bestelling" })
@@ -28,6 +29,10 @@ export class Bestelling {
   @JoinColumn({ name: "Medewerker" })
   aankoper: User;
 
+  @ManyToOne(() => Transportdienst, (transportdienst) => transportdienst.bestellingen)
+  @JoinColumn({ name: "Transportdienst"})
+  transportdienst: Transportdienst;
+
   @OneToOne(() => Notification, (notification) => notification.bestelling)
   notification: Notification;
 
@@ -36,6 +41,9 @@ export class Bestelling {
 
   @Column({ name: "DATUMGEPLAATST", type: "date" })
   datumGeplaatst: Date;
+
+  @Column({ name: "LEVERADRESPOSTCODE", type: "varchar", length: 255})
+  leveradresPostcode: string;
 
   @Column({ name: "ORDERID", type: "varchar", length: 255 })
   orderId: string;

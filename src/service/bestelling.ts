@@ -32,6 +32,8 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           leverancierBedrijf: true,
           klantBedrijf: false,
           aankoper: true,
+          transportdienst: false,
+          notification: false,
         },
         select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
         where: { klantBedrijf: {bedrijfId : bedrijfId} }, 
@@ -50,7 +52,124 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
   }
 };
 
+// GET bestelling by ID
+const getById = async (ctx: Koa.Context) => {
+  const bestellingId = ctx.params.id;
+  debugLog("ophalen bestellingen met Id " + bestellingId);
+  try {
+    if (bestellingId) {
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: true,
+          klantBedrijf: false,
+          aankoper: true,
+          transportdienst: false,
+          notification: false,
+        },
+        select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
+        where: {bestellingId: bestellingId}})
+
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met Id: " + bestellingId);
+          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+        }
+
+        return {...bestelling, status: BestellingStatus[bestelling.status]};
+    }
+    else {
+      return(ctx.status = 404),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+    }
+
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+  
+};
+
+// GET bestelling by track and trace
+const getByTrackAndTrace = async (ctx: any) => {
+  const { ttc, verify } = ctx.query;
+  if (!ttc || !verify) {
+    return (ctx.status = 400), (ctx.body = { error: "Invalid query values" });
+  }
+
+  debugLog("ophalen bestelling met TTC " + ttc);
+  try{
+    
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: false,
+          klantBedrijf: false,
+          aankoper: false,
+          transportdienst: {
+            trackAndTraceFormat: true,
+          },
+          notification: true,
+        },
+        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}, notification : {creationDate: true}},
+        where: {trackAndTraceCode: ttc}});
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met TTC: " + ttc);
+          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+        }
+
+        // verify the input
+        switch (bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring) {
+          case 'POSTCODE':
+            if(verify !== bestelling.leveradresPostcode) {
+              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+            }
+            break;
+          case 'ORDERID':
+            if(verify !== bestelling.orderId) {
+              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+            }
+            break;
+          default: return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+        }
+
+        return {...bestelling, status: BestellingStatus[bestelling.status]};
+    
+    
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+  
+};
+
+const checkBestellingExists = async (bestellingId: number) => {
+  const bestelling = await bestellingRepository.findOne({
+    where: {
+      bestellingId: bestellingId
+    }
+  });
+  if (bestelling == null) {
+    return false;
+  } else {
+    
+      return true;
+  }
+};
+
+const getBedrijfIdFromBestelling = async (bestellingId: number) => {
+  return await bestellingRepository.findOne({
+    relations: {
+      leverancierBedrijf: false,
+      klantBedrijf: true,
+      aankoper: false,
+      transportdienst: false,
+      notification: false,
+    },
+    select: {klantBedrijf : {bedrijfId: true}},
+    where: {bestellingId: bestellingId}
+  });
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
+  getById,
+  getByTrackAndTrace,
+  checkBestellingExists,
+  getBedrijfIdFromBestelling
 };

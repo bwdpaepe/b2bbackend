@@ -10,6 +10,8 @@ import { Session } from "./entity/Session";
 import { Product } from "./entity/Product";
 import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
+import { Transportdienst } from "./entity/Transportdienst";
+import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
 import { Categorie } from "./entity/Categorie";
 
 export const AppDataSource = new DataSource({
@@ -30,6 +32,8 @@ export const AppDataSource = new DataSource({
     Session,
     Winkelmand,
     WinkelmandProducten,
+    Transportdienst, 
+    TrackAndTraceFormat,
     Categorie,
   ],
   migrations: [],

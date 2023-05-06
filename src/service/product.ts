@@ -38,6 +38,11 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       return (ctx.status = 204);
     }
 
+    if (products.length === 0) {
+      debugLog("No products found for company with Id:  " + bedrijfId);
+      return (ctx.status = 204);
+    }
+
     return products;
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
