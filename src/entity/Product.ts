@@ -3,18 +3,29 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Column,
-  JoinColumn
+  JoinColumn,
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
+import { Categorie } from "./Categorie";
 
 @Entity({ name: "producten" })
 export class Product {
   @PrimaryGeneratedColumn({ name: "ID" })
   productId: number;
 
-  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products, {onDelete: "NO ACTION", onUpdate: "NO ACTION"})
+  @ManyToOne(() => Bedrijf, (bedrijf) => bedrijf.products, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
   @JoinColumn({ name: "LEVERANCIER_ID" })
   bedrijf: Bedrijf;
+
+  @ManyToOne(() => Categorie, (categorie) => categorie.producten, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn({ name: "categorie_id" })
+  categorie: Categorie;
 
   @Column({ name: "NAAM", length: 255, unique: true })
   naam: string;

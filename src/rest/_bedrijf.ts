@@ -3,7 +3,6 @@ import bedrijfService from "../service/bedrijf";
 import Koa from "koa";
 import { logger } from "../server";
 
-
 // GET rest route
 const checkBedrijfEndpoint = async (ctx: Koa.Context) => {
   ctx.body = await bedrijfService.checkBedrijfEndpoint();
@@ -17,6 +16,11 @@ const getAllBedrijf = async (ctx: Koa.Context) => {
 // GET bedrijf by 'bedrijfId'
 export const getBedrijfById = async (ctx: Koa.Context) => {
   ctx.body = await bedrijfService.getBedrijfById(ctx);
+};
+
+// GET bedrijf by 'bedrijfId'
+export const getBedrijfCategoriesById = async (ctx: Koa.Context) => {
+  ctx.body = await bedrijfService.getBedrijfCategoriesById(ctx);
 };
 
 /**
@@ -34,6 +38,9 @@ export default function installBedrijfRoutes(app: any) {
    */
   // Test van bedrijf endpoint
   router.get("/test", checkBedrijfEndpoint);
+
+  // GET bedrijf categories by 'bedrijfId'
+  router.get("/categories/:bedrijfId", getBedrijfCategoriesById);
 
   /**
    * PROTECTED ROUTES

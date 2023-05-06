@@ -12,6 +12,7 @@ import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { Transportdienst } from "./entity/Transportdienst";
 import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
+import { Categorie } from "./entity/Categorie";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -22,7 +23,19 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [Bedrijf, User, Bestelling, Product, Notification, Session, Winkelmand, WinkelmandProducten, Transportdienst, TrackAndTraceFormat],
+  entities: [
+    Bedrijf,
+    User,
+    Bestelling,
+    Product,
+    Notification,
+    Session,
+    Winkelmand,
+    WinkelmandProducten,
+    Transportdienst, 
+    TrackAndTraceFormat,
+    Categorie,
+  ],
   migrations: [],
   subscribers: [],
 });
