@@ -11,6 +11,7 @@ import { Winkelmand } from "../entity/Winkelmand";
 import { BesteldProduct } from "../entity/BesteldProduct";
 import { debuglog } from 'util';
 import { WinkelmandProducten } from '../entity/WinkelmandProducten';
+import { Product } from "../entity/Product";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -21,6 +22,7 @@ const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
 const doosRepository = AppDataSource.getRepository(Doos);
 const winkelmandRepository = AppDataSource.getRepository(Winkelmand);
 const winkelmandProductRepository = AppDataSource.getRepository(WinkelmandProducten);
+const productRepository = AppDataSource.getRepository(Product);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -294,11 +296,20 @@ const postBestelling = async (ctx: Koa.Context) => {
     where: {
       doosId: doosId,
     },
+    relations: ["bedrijf"],
   });
   // if doos does not exist, return error
   if (!doos) {
     debugLog("postBestelling: doos does not exist");
     return (ctx.status = 400), (ctx.body = { error: "Doos bestaat niet" });
+  }
+  // check if doos belongs to leverancierbedrijf
+  if (doos.bedrijf.bedrijfId !== leverancierbedrijfId) {
+    debugLog("postBestelling: doos does not belong to leverancierbedrijf");
+    return (
+      (ctx.status = 400),
+      (ctx.body = { error: "Doos behoort niet tot leverancierbedrijf" })
+    );
   }
 
   const lastOrder = await bestellingRepository.find({
@@ -356,6 +367,17 @@ const postBestelling = async (ctx: Koa.Context) => {
 
   for (const winkelmandProduct of winkelmand.winkelmandProducten) {
     //console.log("winkelmandProduct.bedrijf: " + winkelmandProduct.product.bedrijf.naam)
+    if (winkelmandProduct.product.voorraad < winkelmandProduct.aantal) {
+      debugLog( "postBestelling: product.voorraad is not enough");
+      return (
+        (ctx.status = 400),
+        (ctx.body = {
+          error:
+            "Voorraad is niet voldoende voor product " + winkelmandProduct.product.naam +
+            " bij leverancier " + leverancierBedrijf.naam,
+        })
+      );
+    }
     if (winkelmandProduct.product.bedrijf.bedrijfId === leverancierBedrijf.bedrijfId) {
       const besteldProduct = new BesteldProduct();
       besteldProduct.bestelling = bestelling;
@@ -374,6 +396,14 @@ const postBestelling = async (ctx: Koa.Context) => {
     debugLog(
       "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
     );
+      debugLog("tot hier ok")
+    // update voorraad of bestelde producten
+    for (const besteldProduct of bestelling.besteldeProducten) {
+      const product = besteldProduct.product;
+      product.voorraad -= besteldProduct.aantal;
+      await productRepository.save(product);
+      // debugLog( "postBestelling: updated voorraad of product with id: " + product.productId + " to " + product.voorraad);
+    }
 
     // remove all products (that belong to leverancierBedrijf) from winkelmand of this aankoper
     for (const winkelmandProduct of winkelmand.winkelmandProducten) {

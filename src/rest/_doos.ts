@@ -26,14 +26,14 @@ export default function installProductRoutes(app: any) {
    * PUBLIC ROUTES
    */
   // Test van product endpoint
-  // example http://localhost:9000/api/products/test
+  // example http://localhost:9000/api/dozen/test
   router.get("/test", checkDoosEndpoint);
 
   /**
    * PUBLIC ROUTES
    */
   // GET all dozen by 'bedrijfId' via token
-  // example http://localhost:9000/api/dozen
+  // example http://localhost:9000/api/dozen/bedrijf/3
   router.get(
     "/bedrijf/:bedrijfId",
     authService.requireAuthentication,
