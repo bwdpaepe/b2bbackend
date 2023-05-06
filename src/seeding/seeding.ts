@@ -275,6 +275,43 @@ WHERE LEVERANCIER_ID IN (1, 2, 3, 4, 5);
     `);
 
     console.log("Product seeding executed successfully!");
+
+    // Function to generate random numbers within a range
+    function getRandomArbitrary(min: number, max: number) {
+      return (Math.random() * (max - min) + min).toFixed(0);
+    }
+
+    // create dozen for bedrijf 2 tem 5
+    for (let bedrijfId = 2; bedrijfId <= 5; bedrijfId++) {
+      for (let i = 0; i < 5; i++) {
+        // Generate random values for Dimensie properties
+        const breedte = getRandomArbitrary(1, 50);
+        const hoogte = getRandomArbitrary(1, 50);
+        const lengte = getRandomArbitrary(1, 50);
+
+        // Insert the created Dimensie to the database
+        const dimensieResult = await connection.execute(`
+        INSERT INTO dimensies (BREEDTE, HOOGTE, LENGTE)
+        VALUES (${breedte}, ${hoogte}, ${lengte});
+      `);
+
+        // Get the inserted Dimensie id
+        const dimensieId = (dimensieResult[0] as mysql.OkPacket).insertId;
+
+        // Generate random values for Doos properties
+        const type = i % 2 === 0 ? "STANDAARD" : "CUSTOM";
+        const isActief = true;
+        const naam = `RandomDoosName_${i} _${bedrijfId}_${dimensieId}`;
+        const prijs = getRandomArbitrary(10, 100);
+
+        // Insert the created Doos to the database
+        await connection.execute(`
+      INSERT INTO dozen (BEDRIJF_ID, dimensie, DOOSTYPE, ISACTIEF, NAAM, PRIJS)
+      VALUES (${bedrijfId}, ${dimensieId}, '${type}', ${isActief}, '${naam}', ${prijs});
+    `);
+      }
+    }
+
     connection.end();
   } catch (error) {
     console.error(error);

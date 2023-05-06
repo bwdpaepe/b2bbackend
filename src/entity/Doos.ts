@@ -18,7 +18,7 @@ export class Doos {
   @JoinColumn({ name: "BEDRIJF_ID" })
   bedrijf: Bedrijf;
 
-  @OneToOne(() => Dimensie, { eager: true }) // always eager load the Dimensie
+  @OneToOne(() => Dimensie, { eager: true , cascade: true}) // always eager load the Dimensie
   @JoinColumn({ name: "dimensie" })
   dimensie: Dimensie;
 

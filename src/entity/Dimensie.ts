@@ -2,9 +2,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
 } from "typeorm";
-import { Bedrijf } from "./Bedrijf";
 
 @Entity({ name: "dimensies" })
 export class Dimensie {
