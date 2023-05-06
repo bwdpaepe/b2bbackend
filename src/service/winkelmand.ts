@@ -132,34 +132,45 @@ const AddProduct = async (ctx: Koa.Context) => {
     );
   }
   if (product) {
-    if (
-      winkelmand.winkelmandProducten.filter(
-        (wmp) => wmp.product_id === product.productId
-      ).length
-    ) {
-      debugLog("Product already in winkelmand");
-      return (
-        (ctx.status = 400),
-        (ctx.body = { error: "Dit product zit al reeds in je winkelmand" })
-      );
+    const existingWMP = winkelmand.winkelmandProducten.find(
+      (wmp) => wmp.product_id === product.productId
+    );
+
+    if (existingWMP) { // If the product already exists in the winkelmand, update the amount
+      const newAantal = existingWMP.aantal + aantal;
+      if (product.voorraad < newAantal) {
+        debugLog("Product stock too low");
+        return (
+          (ctx.status = 400),
+          (ctx.body = {
+            error: "De voorraad van dit product is lager dan het gewenste aantal (controleer je winkelmand)",
+          })
+        );
+      }
+      existingWMP.aantal = newAantal;
+      await winkelmandProductenRepo.save(existingWMP);
+      debugLog("Product amount updated in winkelmand");
+      ctx.status = 200;
+      return;
+    } else { // If the product doesn't exist in the winkelmand, create a new winkelmandProduct
+      if (product.voorraad < aantal) {
+        debugLog("Product stock too low");
+        return (
+          (ctx.status = 400),
+          (ctx.body = {
+            error: "De voorraad van dit product is lager dan het gewenste aantal (controleer je winkelmand)",
+          })
+        );
+      }
+      const wmp = new WinkelmandProducten();
+      wmp.product = product;
+      wmp.winkelmand = winkelmand;
+      wmp.aantal = aantal;
+      await winkelmandProductenRepo.save(wmp);
+      debugLog("Product added to winkelmand");
+      ctx.status = 200;
+      return;
     }
-    if (product.voorraad < aantal) {
-      debugLog("Product stock too low");
-      return (
-        (ctx.status = 400),
-        (ctx.body = {
-          error: "De voorraad van dit product is lager dan het gewenste aantal",
-        })
-      );
-    }
-    const wmp = new WinkelmandProducten();
-    wmp.product = product;
-    wmp.winkelmand = winkelmand;
-    wmp.aantal = aantal;
-    await winkelmandProductenRepo.save(wmp);
-    debugLog("Product added to winkelmand");
-    ctx.status = 200;
-    return;
   } else {
     debugLog("Product not found");
     return (
