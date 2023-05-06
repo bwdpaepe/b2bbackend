@@ -30,7 +30,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
-      relations: ["categorie"],
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf    
     });
 
     if (!products || products.length === 0) {
@@ -60,7 +60,7 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 
     const product = await productRepository.findOne({
       where: { productId: productId },
-      relations: ["categorie"],
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf 
     });
 
     if (!product) {

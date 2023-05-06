@@ -118,7 +118,11 @@ const AddProduct = async (ctx: Koa.Context) => {
     where: { productId: productId },
   });
 
+  // debuglog with info from the lines above
+  debugLog("User: " + userId + " Product: " + productId + " Aantal: " + aantal + " Winkelmand_ID: " + winkelmand.id + " Product_ID: " + product.productId );
+
   if (!winkelmand) {
+    debugLog("Winkelmand not found");
     return (
       (ctx.status = 500),
       (ctx.body = {
@@ -133,12 +137,14 @@ const AddProduct = async (ctx: Koa.Context) => {
         (wmp) => wmp.product_id === product.productId
       ).length
     ) {
+      debugLog("Product already in winkelmand");
       return (
         (ctx.status = 400),
         (ctx.body = { error: "Dit product zit al reeds in je winkelmand" })
       );
     }
     if (product.voorraad < aantal) {
+      debugLog("Product stock too low");
       return (
         (ctx.status = 400),
         (ctx.body = {
@@ -151,9 +157,11 @@ const AddProduct = async (ctx: Koa.Context) => {
     wmp.winkelmand = winkelmand;
     wmp.aantal = aantal;
     await winkelmandProductenRepo.save(wmp);
+    debugLog("Product added to winkelmand");
     ctx.status = 200;
     return;
   } else {
+    debugLog("Product not found");
     return (
       (ctx.status = 404), (ctx.body = { error: "Dit product bestaat niet" })
     );
