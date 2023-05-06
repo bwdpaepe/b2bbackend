@@ -16,9 +16,14 @@ export const getBestellingById = async (ctx: Koa.Context) => {
   ctx.body = await bestellingService.getById(ctx);
 };
 
-// POST track and trace
+// GET track and trace
 export const getBestellingByTrackAndTrace = async (ctx: Koa.Context) => {
   ctx.body = await bestellingService.getByTrackAndTrace(ctx);
+};
+
+// POST bestelling
+export const postBestelling = async (ctx: Koa.Context) => {
+  ctx.body = await bestellingService.postBestelling(ctx);
 };
 
 export default function installBestellingRoutes(app: any) {
@@ -42,6 +47,9 @@ export default function installBestellingRoutes(app: any) {
   // get bestelling by id
   // example http://localhost:9000/api/bestellingen/2
   router.get("/:id", authService.requireAuthentication, validateService.userCanAccessBestelling, getBestellingById);
+
+  // post bestelling
+  router.post("/", authService.requireAuthentication, postBestelling);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of bestellingen Route (_bestelling.ts) completed`);

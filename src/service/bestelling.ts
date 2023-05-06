@@ -3,13 +3,18 @@ import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Bestelling } from "../entity/Bestelling";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
-
+import { User } from "../entity/User";
+import { Bedrijf } from "../entity/Bedrijf";
+import { Doos } from "../entity/Doos";
+import userService from "./users";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
 };
 
 const bestellingRepository = AppDataSource.getRepository(Bestelling);
+const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
+const doosRepository = AppDataSource.getRepository(Doos);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -24,7 +29,7 @@ const checkBestellingEndpoint = async () => {
  */
 const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
   const { bedrijfId } = ctx.state.session;
-  debugLog("ophalen bestellingen voor bedrijf " + bedrijfId)
+  debugLog("ophalen bestellingen voor bedrijf " + bedrijfId);
   try {
     if (bedrijfId) {
       const bestellingen: Bestelling[] = await bestellingRepository.find({
@@ -35,17 +40,24 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           transportdienst: false,
           notification: false,
         },
-        select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
-        where: { klantBedrijf: {bedrijfId : bedrijfId} }, 
+        select: {
+          leverancierBedrijf: { naam: true },
+          aankoper: { firstname: true, lastname: true, email: true },
+        },
+        where: { klantBedrijf: { bedrijfId: bedrijfId } },
       });
       const bestellingInfo = bestellingen.map((bestelling: Bestelling) => ({
         ...bestelling,
         status: BestellingStatus[bestelling.status],
       }));
       return bestellingInfo;
-    }
-    else{
-      return(ctx.status = 404),(ctx.body = {error : "er ging iets mis bij het laden van het bijhorend bedrijf"});
+    } else {
+      return (
+        (ctx.status = 404),
+        (ctx.body = {
+          error: "er ging iets mis bij het laden van het bijhorend bedrijf",
+        })
+      );
     }
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
@@ -66,24 +78,31 @@ const getById = async (ctx: Koa.Context) => {
           transportdienst: false,
           notification: false,
         },
-        select: {leverancierBedrijf : {naam: true}, aankoper : {firstname: true, lastname : true, email : true}},
-        where: {bestellingId: bestellingId}})
+        select: {
+          leverancierBedrijf: { naam: true },
+          aankoper: { firstname: true, lastname: true, email: true },
+        },
+        where: { bestellingId: bestellingId },
+      });
 
-        if (!bestelling) {
-          debugLog("geen bestelling gevonden met Id: " + bestellingId);
-          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
-        }
+      if (!bestelling) {
+        debugLog("geen bestelling gevonden met Id: " + bestellingId);
+        return (
+          (ctx.status = 204),
+          (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
+        );
+      }
 
-        return {...bestelling, status: BestellingStatus[bestelling.status]};
+      return { ...bestelling, status: BestellingStatus[bestelling.status] };
+    } else {
+      return (
+        (ctx.status = 404),
+        (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
+      );
     }
-    else {
-      return(ctx.status = 404),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
-    }
-
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
-  
 };
 
 // GET bestelling by track and trace
@@ -94,60 +113,81 @@ const getByTrackAndTrace = async (ctx: any) => {
   }
 
   debugLog("ophalen bestelling met TTC " + ttc);
-  try{
-    
-      const bestelling: Bestelling = await bestellingRepository.findOne({
-        relations: {
-          leverancierBedrijf: false,
-          klantBedrijf: false,
-          aankoper: false,
-          transportdienst: {
-            trackAndTraceFormat: true,
-          },
-          notification: true,
+  try {
+    const bestelling: Bestelling = await bestellingRepository.findOne({
+      relations: {
+        leverancierBedrijf: false,
+        klantBedrijf: false,
+        aankoper: false,
+        transportdienst: {
+          trackAndTraceFormat: true,
         },
-        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}, notification : {creationDate: true}},
-        where: {trackAndTraceCode: ttc}});
-        if (!bestelling) {
-          debugLog("geen bestelling gevonden met TTC: " + ttc);
-          return (ctx.status = 204),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
-        }
+        notification: true,
+      },
+      select: {
+        transportdienst: {
+          naam: true,
+          trackAndTraceFormat: { verificatiecodestring: true },
+        },
+        notification: { creationDate: true },
+      },
+      where: { trackAndTraceCode: ttc },
+    });
+    if (!bestelling) {
+      debugLog("geen bestelling gevonden met TTC: " + ttc);
+      return (
+        (ctx.status = 204),
+        (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
+      );
+    }
 
-        // verify the input
-        switch (bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring) {
-          case 'POSTCODE':
-            if(verify !== bestelling.leveradresPostcode) {
-              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
-            }
-            break;
-          case 'ORDERID':
-            if(verify !== bestelling.orderId) {
-              return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
-            }
-            break;
-          default: return(ctx.status = 400),(ctx.body = {error : "Deze bestelling kan niet weergegeven worden"});
+    // verify the input
+    switch (
+      bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring
+    ) {
+      case "POSTCODE":
+        if (verify !== bestelling.leveradresPostcode) {
+          return (
+            (ctx.status = 400),
+            (ctx.body = {
+              error: "Deze bestelling kan niet weergegeven worden",
+            })
+          );
         }
+        break;
+      case "ORDERID":
+        if (verify !== bestelling.orderId) {
+          return (
+            (ctx.status = 400),
+            (ctx.body = {
+              error: "Deze bestelling kan niet weergegeven worden",
+            })
+          );
+        }
+        break;
+      default:
+        return (
+          (ctx.status = 400),
+          (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
+        );
+    }
 
-        return {...bestelling, status: BestellingStatus[bestelling.status]};
-    
-    
+    return { ...bestelling, status: BestellingStatus[bestelling.status] };
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
-  
 };
 
 const checkBestellingExists = async (bestellingId: number) => {
   const bestelling = await bestellingRepository.findOne({
     where: {
-      bestellingId: bestellingId
-    }
+      bestellingId: bestellingId,
+    },
   });
   if (bestelling == null) {
     return false;
   } else {
-    
-      return true;
+    return true;
   }
 };
 
@@ -160,9 +200,130 @@ const getBedrijfIdFromBestelling = async (bestellingId: number) => {
       transportdienst: false,
       notification: false,
     },
-    select: {klantBedrijf : {bedrijfId: true}},
-    where: {bestellingId: bestellingId}
+    select: { klantBedrijf: { bedrijfId: true } },
+    where: { bestellingId: bestellingId },
   });
+};
+
+const postBestelling = async (ctx: Koa.Context) => {
+  const { bedrijfId } = ctx.state.session;
+  const { userId } = ctx.state.session;
+  const leverancierbedrijfId = Number(ctx.query.leverancierbedrijfId);
+  const doosId = Number(ctx.query.doosId);
+  const leveradresStraat = String(ctx.query.leveradresStraat);
+  const leveradresNummer = String(ctx.query.leveradresNummer);
+  const leveradresPostcode = String(ctx.query.leveradresPostcode);
+  const leveradresStad = String(ctx.query.leveradresStad);
+  const leveradresLand = String(ctx.query.leveradresLand);
+
+  const aankoper: User = await userService.getUserById(userId);
+  const aankoperBedrijf = await bedrijfRepository.findOne({
+    where: { bedrijfId: bedrijfId },
+  });
+
+  // debuglog the values of all parameters in one string
+  debugLog(
+    "postBestelling: " +
+      "leverancierbedrijfId: " + leverancierbedrijfId +
+      ", doosId: " + doosId +
+      ", leveradresStraat: " + leveradresStraat +
+      ", leveradresNummer: " + leveradresNummer +
+      ", leveradresPostcode: " + leveradresPostcode +
+      ", leveradresStad: " + leveradresStad +
+      ", leveradresLand: " + leveradresLand
+  );
+
+
+  // if not all parameters are given, return error
+  if (
+    !leverancierbedrijfId ||
+    !doosId ||
+    !leveradresStraat ||
+    !leveradresNummer ||
+    !leveradresPostcode ||
+    !leveradresStad ||
+    !leveradresLand
+  ) {
+    debugLog("postBestelling: not all parameters are given");
+    return (ctx.status = 400), (ctx.body = { error: "Ongeldige gegevens" });
+  }
+
+  // if bedrijfId is the same as leverancierbedrijfId, return error
+  if (bedrijfId === leverancierbedrijfId) {
+    debugLog("postBestelling: klantBedrijfId is the same as leverancierbedrijfId");
+    return (
+      (ctx.status = 400),
+      (ctx.body = {
+        error: "Je kan geen bestelling plaatsen bij je eigen bedrijf",
+      })
+    );
+  }
+
+  // fetch leverancierbedrijf from database
+  const leverancierBedrijf = await bedrijfRepository.findOne({
+    where: {
+      bedrijfId: leverancierbedrijfId,
+    },
+  });
+  // if leverancierbedrijf does not exist, return error
+  if (!leverancierBedrijf) {
+    debugLog("postBestelling: leverancierbedrijf does not exist");
+    return (
+      (ctx.status = 400),
+      (ctx.body = { error: "Leverancierbedrijf bestaat niet" })
+    );
+  }
+
+ 
+
+  // fetch doos from database
+  const doos = await doosRepository.findOne({
+    where: {
+      doosId: doosId,
+    },
+  });
+  // if doos does not exist, return error
+  if (!doos) {
+    debugLog("postBestelling: doos does not exist");
+    return (ctx.status = 400), (ctx.body = { error: "Doos bestaat niet" });
+  }
+
+  
+
+  const lastOrder = await bestellingRepository.find({
+    order: { bestellingId: "DESC" },
+    take: 1,
+  });
+  const newOrderId = lastOrder ? lastOrder[0].bestellingId + 1 : 1;
+  debugLog("newOrderId: " + newOrderId);
+
+  // create bestelling
+  const bestelling = new Bestelling();
+  bestelling.klantBedrijf = aankoperBedrijf;
+  bestelling.leverancierBedrijf = leverancierBedrijf;
+  bestelling.aankoper = aankoper;
+  bestelling.doos = doos;
+  bestelling.leveradresStraat = leveradresStraat;
+  bestelling.leveradresNummer = leveradresNummer;
+  bestelling.leveradresPostcode = leveradresPostcode;
+  bestelling.leveradresStad = leveradresStad;
+  bestelling.leveradresLand = leveradresLand;
+  bestelling.status = BestellingStatus.GEPLAATST;
+  bestelling.orderId = "Order"  + newOrderId; 
+  bestelling.datumGeplaatst = new Date();
+  bestelling.klantnaam = aankoperBedrijf.naam;
+
+  debugLog("tot hier ok");
+  // TODO: add all products (that belong to leverancierBedrijf) from winkelmand of this aankoper to bestelling
+
+  // save bestelling to database
+  try {
+    const savedBestelling = await bestellingRepository.save(bestelling);
+    return (ctx.status = 201), (ctx.body = savedBestelling); // 201 = created
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+
 };
 
 export default {
@@ -171,5 +332,6 @@ export default {
   getById,
   getByTrackAndTrace,
   checkBestellingExists,
-  getBedrijfIdFromBestelling
+  getBedrijfIdFromBestelling,
+  postBestelling,
 };

@@ -13,6 +13,8 @@ import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { Transportdienst } from "./entity/Transportdienst";
 import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
 import { Categorie } from "./entity/Categorie";
+import { Doos } from "./entity/Doos";
+import { Dimensie } from "./entity/Dimensie";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -35,6 +37,8 @@ export const AppDataSource = new DataSource({
     Transportdienst, 
     TrackAndTraceFormat,
     Categorie,
+    Doos,
+    Dimensie,
   ],
   migrations: [],
   subscribers: [],
