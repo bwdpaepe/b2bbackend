@@ -214,6 +214,7 @@ const getBedrijfIdFromBestelling = async (bestellingId: number) => {
 };
 
 const postBestelling = async (ctx: Koa.Context) => {
+  try {
   const { bedrijfId } = ctx.state.session;
   const { userId } = ctx.state.session;
   const leverancierbedrijfId = Number(ctx.query.leverancierbedrijfId);
@@ -259,7 +260,7 @@ const postBestelling = async (ctx: Koa.Context) => {
     !leveradresLand
   ) {
     debugLog("postBestelling: not all parameters are given");
-    return (ctx.status = 400), (ctx.body = { error: "Ongeldige gegevens" });
+    throw new Error("Niet alle parameters zijn ingevuld of geldig");
   }
 
   // if bedrijfId is the same as leverancierbedrijfId, return error
@@ -267,12 +268,7 @@ const postBestelling = async (ctx: Koa.Context) => {
     debugLog(
       "postBestelling: klantBedrijfId is the same as leverancierbedrijfId"
     );
-    return (
-      (ctx.status = 400),
-      (ctx.body = {
-        error: "Je kan geen bestelling plaatsen bij je eigen bedrijf",
-      })
-    );
+    throw new Error("Je kan geen bestelling plaatsen bij je eigen bedrijf");
   }
 
   // fetch leverancierbedrijf from database
@@ -284,10 +280,7 @@ const postBestelling = async (ctx: Koa.Context) => {
   // if leverancierbedrijf does not exist, return error
   if (!leverancierBedrijf) {
     debugLog("postBestelling: leverancierbedrijf does not exist");
-    return (
-      (ctx.status = 400),
-      (ctx.body = { error: "Leverancierbedrijf bestaat niet" })
-    );
+    throw new Error("Leverancierbedrijf bestaat niet");
   }
   debugLog("leverancierBedrijf: " + leverancierBedrijf.naam);
 
@@ -301,15 +294,12 @@ const postBestelling = async (ctx: Koa.Context) => {
   // if doos does not exist, return error
   if (!doos) {
     debugLog("postBestelling: doos does not exist");
-    return (ctx.status = 400), (ctx.body = { error: "Doos bestaat niet" });
+    throw new Error("Doos bestaat niet");
   }
   // check if doos belongs to leverancierbedrijf
   if (doos.bedrijf.bedrijfId !== leverancierbedrijfId) {
     debugLog("postBestelling: doos does not belong to leverancierbedrijf");
-    return (
-      (ctx.status = 400),
-      (ctx.body = { error: "Doos behoort niet tot leverancierbedrijf" })
-    );
+    throw new Error("Doos behoort niet tot leverancierbedrijf");
   }
 
   const lastOrder = await bestellingRepository.find({
@@ -337,12 +327,7 @@ const postBestelling = async (ctx: Koa.Context) => {
   )
 ) {
   debugLog("postBestelling: winkelmand is empty");
-  return (
-    (ctx.status = 400),
-    (ctx.body = {
-      error: "Winkelmand is leeg bij leverancier " + leverancierBedrijf.naam,
-    })
-  );
+  throw new Error("Winkelmand is leeg bij leverancier " + leverancierBedrijf.naam);
 }
 
   // create bestelling
@@ -369,14 +354,8 @@ const postBestelling = async (ctx: Koa.Context) => {
     //console.log("winkelmandProduct.bedrijf: " + winkelmandProduct.product.bedrijf.naam)
     if (winkelmandProduct.product.voorraad < winkelmandProduct.aantal) {
       debugLog( "postBestelling: product.voorraad is not enough");
-      return (
-        (ctx.status = 400),
-        (ctx.body = {
-          error:
-            "Voorraad is niet voldoende voor product " + winkelmandProduct.product.naam +
-            " bij leverancier " + leverancierBedrijf.naam,
-        })
-      );
+      throw new Error("Voorraad is niet voldoende (meer) voor product " + winkelmandProduct.product.naam +
+      " bij leverancier " + leverancierBedrijf.naam);
     }
     if (winkelmandProduct.product.bedrijf.bedrijfId === leverancierBedrijf.bedrijfId) {
       const besteldProduct = new BesteldProduct();
@@ -391,7 +370,7 @@ const postBestelling = async (ctx: Koa.Context) => {
   }
 
   // save bestelling to database
-  try {
+  
     const savedBestelling = await bestellingRepository.save(bestelling);
     debugLog(
       "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
