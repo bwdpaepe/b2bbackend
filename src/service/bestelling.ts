@@ -7,6 +7,10 @@ import { User } from "../entity/User";
 import { Bedrijf } from "../entity/Bedrijf";
 import { Doos } from "../entity/Doos";
 import userService from "./users";
+import { Winkelmand } from "../entity/Winkelmand";
+import { BesteldProduct } from "../entity/BesteldProduct";
+import { debuglog } from 'util';
+import { WinkelmandProducten } from '../entity/WinkelmandProducten';
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -15,6 +19,8 @@ const debugLog = (message: any, meta = {}) => {
 const bestellingRepository = AppDataSource.getRepository(Bestelling);
 const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
 const doosRepository = AppDataSource.getRepository(Doos);
+const winkelmandRepository = AppDataSource.getRepository(Winkelmand);
+const winkelmandProductRepository = AppDataSource.getRepository(WinkelmandProducten);
 
 /**
  * Check if the endpoint /api/bedrijf/ is available.
@@ -224,15 +230,21 @@ const postBestelling = async (ctx: Koa.Context) => {
   // debuglog the values of all parameters in one string
   debugLog(
     "postBestelling: " +
-      "leverancierbedrijfId: " + leverancierbedrijfId +
-      ", doosId: " + doosId +
-      ", leveradresStraat: " + leveradresStraat +
-      ", leveradresNummer: " + leveradresNummer +
-      ", leveradresPostcode: " + leveradresPostcode +
-      ", leveradresStad: " + leveradresStad +
-      ", leveradresLand: " + leveradresLand
+      "leverancierbedrijfId: " +
+      leverancierbedrijfId +
+      ", doosId: " +
+      doosId +
+      ", leveradresStraat: " +
+      leveradresStraat +
+      ", leveradresNummer: " +
+      leveradresNummer +
+      ", leveradresPostcode: " +
+      leveradresPostcode +
+      ", leveradresStad: " +
+      leveradresStad +
+      ", leveradresLand: " +
+      leveradresLand
   );
-
 
   // if not all parameters are given, return error
   if (
@@ -250,7 +262,9 @@ const postBestelling = async (ctx: Koa.Context) => {
 
   // if bedrijfId is the same as leverancierbedrijfId, return error
   if (bedrijfId === leverancierbedrijfId) {
-    debugLog("postBestelling: klantBedrijfId is the same as leverancierbedrijfId");
+    debugLog(
+      "postBestelling: klantBedrijfId is the same as leverancierbedrijfId"
+    );
     return (
       (ctx.status = 400),
       (ctx.body = {
@@ -273,8 +287,7 @@ const postBestelling = async (ctx: Koa.Context) => {
       (ctx.body = { error: "Leverancierbedrijf bestaat niet" })
     );
   }
-
- 
+  debugLog("leverancierBedrijf: " + leverancierBedrijf.naam);
 
   // fetch doos from database
   const doos = await doosRepository.findOne({
@@ -287,8 +300,6 @@ const postBestelling = async (ctx: Koa.Context) => {
     debugLog("postBestelling: doos does not exist");
     return (ctx.status = 400), (ctx.body = { error: "Doos bestaat niet" });
   }
-
-  
 
   const lastOrder = await bestellingRepository.find({
     order: { bestellingId: "DESC" },
@@ -309,21 +320,52 @@ const postBestelling = async (ctx: Koa.Context) => {
   bestelling.leveradresStad = leveradresStad;
   bestelling.leveradresLand = leveradresLand;
   bestelling.status = BestellingStatus.GEPLAATST;
-  bestelling.orderId = "Order"  + newOrderId; 
+  bestelling.orderId = "Order" + newOrderId;
   bestelling.datumGeplaatst = new Date();
   bestelling.klantnaam = aankoperBedrijf.naam;
+  bestelling.besteldeProducten = [];
 
   debugLog("tot hier ok");
   // TODO: add all products (that belong to leverancierBedrijf) from winkelmand of this aankoper to bestelling
+  const winkelmand = await winkelmandRepository.findOne({
+    where: { user: { userId: aankoper.userId } },
+    relations: [
+      "user",
+      "winkelmandProducten",
+      "winkelmandProducten.product",
+      "winkelmandProducten.product.bedrijf",
+    ],
+  });
+
+  // debugLog("winkelmand: " + JSON.stringify(winkelmand));
+  // debugLog("winkelmand.winkelmandProducten: " + JSON.stringify(winkelmand.winkelmandProducten));
+
+  for (const winkelmandProduct of winkelmand.winkelmandProducten) {
+    //console.log("winkelmandProduct.bedrijf: " + winkelmandProduct.product.bedrijf.naam)
+    if (winkelmandProduct.product.bedrijf.bedrijfId === leverancierBedrijf.bedrijfId) {
+      const besteldProduct = new BesteldProduct();
+      besteldProduct.bestelling = bestelling;
+      besteldProduct.product = winkelmandProduct.product;
+      besteldProduct.aantal = winkelmandProduct.aantal;
+      besteldProduct.eenheidsprijs = winkelmandProduct.product.eenheidsprijs;
+      besteldProduct.naam = winkelmandProduct.product.naam;
+      // console.log("besteldProduct: " + besteldProduct);
+      bestelling.besteldeProducten.push(besteldProduct);
+    }
+  }
 
   // save bestelling to database
   try {
     const savedBestelling = await bestellingRepository.save(bestelling);
-    return (ctx.status = 201), (ctx.body = savedBestelling); // 201 = created
+    debugLog(
+      "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
+    );
+
+
+    return (ctx.status = 201);
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
-
 };
 
 export default {

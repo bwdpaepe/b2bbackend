@@ -44,7 +44,7 @@ export class Bestelling {
   @JoinColumn({ name: "Doos" })
   doos: Doos;
 
-  @OneToMany( () => BesteldProduct, (besteldeProduct) => besteldeProduct.bestelling )
+  @OneToMany( () => BesteldProduct, (besteldeProduct) => besteldeProduct.bestelling, {cascade: true} )
   besteldeProducten: BesteldProduct[];
 
   @OneToOne(() => Notification, (notification) => notification.bestelling)
