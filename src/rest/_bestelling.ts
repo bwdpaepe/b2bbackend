@@ -49,6 +49,7 @@ export default function installBestellingRoutes(app: any) {
   router.get("/:id", authService.requireAuthentication, validateService.userCanAccessBestelling, getBestellingById);
 
   // post bestelling
+  // example: http://localhost:9000/api/bestellingen?leverancierbedrijfId=3&doosId=8&leveradresStraat=test_straat&leveradresNummer=test_nummer&leveradresPostcode=test_postcode&leveradresStad=test_stad&leveradresLand=test_land
   router.post("/", authService.requireAuthentication, postBestelling);
 
   app.use(router.routes()).use(router.allowedMethods());
