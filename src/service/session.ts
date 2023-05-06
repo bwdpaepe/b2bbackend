@@ -61,7 +61,7 @@ const saveSessionEnd = async (ctx: Koa.Context) => {
 
 const getSessionOfUser = async (ctx: Koa.Context) => {
   try {
-    debugLog(`getSessionOfUser called`);
+    // debugLog(`getSessionOfUser called`);
     const JWTUserInfo = await authService.checkAndParseSession(
       ctx.headers.authorization
     );
@@ -70,7 +70,7 @@ const getSessionOfUser = async (ctx: Koa.Context) => {
       debugLog(`getSessionOfUser no session found for user: ${JWTUserInfo.userId}`);
       throw new Error(`getSessionOfUser no session found for user: ${JWTUserInfo.userId}`);
     }
-    debugLog(`getSessionOfUser found session: ${existingSession.sessionId} for user: ${JWTUserInfo.userId } with sessionStart: ${existingSession.sessionStart}`);
+    // debugLog(`getSessionOfUser found session: ${existingSession.sessionId} for user: ${JWTUserInfo.userId } with sessionStart: ${existingSession.sessionStart}`);
     return existingSession;
   } catch (error: any) {
     debugLog(`getSessionOfUser error: ${error.message}`);
@@ -80,9 +80,9 @@ const getSessionOfUser = async (ctx: Koa.Context) => {
 
 const updateSession = async (session: Session) => {
   try {
-    debugLog(`updateSession called`);
+    // debugLog(`updateSession called`);
     const updatedSession = await sessionRepository.save(session);
-    debugLog(`session updated succesfully`);
+    // debugLog(`session updated succesfully`);
     return updatedSession;
   } catch (error: any) {
     debugLog(`updateSession error: ${error.message}`);

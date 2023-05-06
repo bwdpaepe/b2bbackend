@@ -126,7 +126,7 @@ const checkUserPermission = async (requiredFunction: Functions, ctx: any) => {
     const hasPermission =
       userFunction.toLowerCase() === requiredFunction.toLowerCase() 
       // || userFunction.toLowerCase() === Functions.ADMIN.toLowerCase(); // admin has access to everything
-    debugLog("User function: " + userFunction.toLowerCase() + ", Required function: " + requiredFunction.toLowerCase() + ", Has permission: " + hasPermission );
+    // debugLog("User function: " + userFunction.toLowerCase() + ", Required function: " + requiredFunction.toLowerCase() + ", Has permission: " + hasPermission );
     if (!hasPermission) {
       throw new Error(
         "You are not allowed to view this part of the application. User function: " +
