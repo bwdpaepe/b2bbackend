@@ -308,6 +308,32 @@ const postBestelling = async (ctx: Koa.Context) => {
   const newOrderId = lastOrder ? lastOrder[0].bestellingId + 1 : 1;
   debugLog("newOrderId: " + newOrderId);
 
+  const winkelmand = await winkelmandRepository.findOne({
+    where: { user: { userId: aankoper.userId } },
+    relations: [
+      "user",
+      "winkelmandProducten",
+      "winkelmandProducten.product",
+      "winkelmandProducten.product.bedrijf",
+    ],
+  });
+
+  // if winkelmand is empty for this leverancierBedrijf, return error (this should not happen)
+  if (
+  !winkelmand ||
+  !winkelmand.winkelmandProducten.some(
+    (wp) => wp.product.bedrijf.bedrijfId === leverancierBedrijf.bedrijfId
+  )
+) {
+  debugLog("postBestelling: winkelmand is empty");
+  return (
+    (ctx.status = 400),
+    (ctx.body = {
+      error: "Winkelmand is leeg bij leverancier " + leverancierBedrijf.naam,
+    })
+  );
+}
+
   // create bestelling
   const bestelling = new Bestelling();
   bestelling.klantBedrijf = aankoperBedrijf;
@@ -324,18 +350,6 @@ const postBestelling = async (ctx: Koa.Context) => {
   bestelling.datumGeplaatst = new Date();
   bestelling.klantnaam = aankoperBedrijf.naam;
   bestelling.besteldeProducten = [];
-
-  debugLog("tot hier ok");
-  // TODO: add all products (that belong to leverancierBedrijf) from winkelmand of this aankoper to bestelling
-  const winkelmand = await winkelmandRepository.findOne({
-    where: { user: { userId: aankoper.userId } },
-    relations: [
-      "user",
-      "winkelmandProducten",
-      "winkelmandProducten.product",
-      "winkelmandProducten.product.bedrijf",
-    ],
-  });
 
   // debugLog("winkelmand: " + JSON.stringify(winkelmand));
   // debugLog("winkelmand.winkelmandProducten: " + JSON.stringify(winkelmand.winkelmandProducten));
@@ -361,6 +375,13 @@ const postBestelling = async (ctx: Koa.Context) => {
       "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
     );
 
+    // remove all products (that belong to leverancierBedrijf) from winkelmand of this aankoper
+    for (const winkelmandProduct of winkelmand.winkelmandProducten) {
+      if (winkelmandProduct.product.bedrijf.bedrijfId === leverancierBedrijf.bedrijfId) {
+        await winkelmandProductRepository.remove(winkelmandProduct);
+        // debugLog("postBestelling: removed winkelmandProduct with id: " + winkelmandProduct.product.productId)
+      }
+    }
 
     return (ctx.status = 201);
   } catch (error: any) {
