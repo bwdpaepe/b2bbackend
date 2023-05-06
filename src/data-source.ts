@@ -15,6 +15,7 @@ import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
 import { Categorie } from "./entity/Categorie";
 import { Doos } from "./entity/Doos";
 import { Dimensie } from "./entity/Dimensie";
+import { BesteldProduct } from "./entity/BesteldProduct";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -39,6 +40,7 @@ export const AppDataSource = new DataSource({
     Categorie,
     Doos,
     Dimensie,
+    BesteldProduct,
   ],
   migrations: [],
   subscribers: [],

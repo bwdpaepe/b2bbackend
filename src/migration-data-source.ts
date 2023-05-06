@@ -21,6 +21,7 @@ import { categorieSeeding1683221473794 } from "./migrations/1683221473794-catego
 import { seedBedrijfCategorieTable1683225889624 } from "./migrations/1683225889624-seedBedrijfCategorieTable";
 import { Doos } from "./entity/Doos";
 import { Dimensie } from "./entity/Dimensie";
+import { BesteldProduct } from "./entity/BesteldProduct";
 
 export default new DataSource({
   type: "mysql",
@@ -43,6 +44,7 @@ export default new DataSource({
     Categorie,
     Doos,
     Dimensie,
+    BesteldProduct,
   ],
   migrations: [
     AddSessions1681898251992,

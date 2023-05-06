@@ -3,11 +3,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { BestellingStatus } from "../enums/BestellingStatusEnum";
 import { Bedrijf } from "./Bedrijf";
+import { BesteldProduct } from "./BesteldProduct";
 import { Doos } from "./Doos";
 import { Notification } from "./Notification";
 import { Transportdienst } from "./Transportdienst";
@@ -41,6 +43,9 @@ export class Bestelling {
   @ManyToOne(() => Doos)
   @JoinColumn({ name: "Doos" })
   doos: Doos;
+
+  @OneToMany( () => BesteldProduct, (besteldeProduct) => besteldeProduct.bestelling )
+  besteldeProducten: BesteldProduct[];
 
   @OneToOne(() => Notification, (notification) => notification.bestelling)
   notification: Notification;
