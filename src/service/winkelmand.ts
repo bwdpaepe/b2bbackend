@@ -109,7 +109,7 @@ const seedWinkelmandOpAankopers = async () => {
 const AddProduct = async (ctx: Koa.Context) => {
   const { userId } = ctx.state.session;
   const productId = ctx.params.product_id;
-  const aantal = ctx.params.aantal;
+  const aantal = Number(ctx.params.aantal);
   const winkelmand = await winkelmandRepo.findOne({
     where: { user: { userId: userId } },
     relations: { winkelmandProducten: true },
@@ -138,8 +138,9 @@ const AddProduct = async (ctx: Koa.Context) => {
 
     if (existingWMP) { // If the product already exists in the winkelmand, update the amount
       const newAantal = existingWMP.aantal + aantal;
+      debugLog("existingWMP.aantal : " + existingWMP.aantal + ", bijkomend aantal: " + aantal + ", newAantal: " + newAantal);
       if (product.voorraad < newAantal) {
-        debugLog("Product stock too low");
+        debugLog("Product stock too low (existing product)");
         return (
           (ctx.status = 400),
           (ctx.body = {
@@ -154,7 +155,7 @@ const AddProduct = async (ctx: Koa.Context) => {
       return;
     } else { // If the product doesn't exist in the winkelmand, create a new winkelmandProduct
       if (product.voorraad < aantal) {
-        debugLog("Product stock too low");
+        debugLog("Product stock too low (new product)");
         return (
           (ctx.status = 400),
           (ctx.body = {
