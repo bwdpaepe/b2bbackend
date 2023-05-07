@@ -36,7 +36,7 @@ export default function installProductRoutes(app: any) {
   // example http://localhost:9000/api/dozen/bedrijf/3
   router.get(
     "/bedrijf/:bedrijfId",
-    authService.requireAuthentication,
+    //authService.requireAuthentication,
     getAllDoosFromBedrijf
   );
 
