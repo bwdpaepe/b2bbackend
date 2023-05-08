@@ -137,6 +137,42 @@ const getByTrackAndTrace = async (ctx: any) => {
   
 };
 
+// GET verificatie by track and trace
+const getVerificatieByTrackAndTrace = async (ctx: any) => {
+  const { ttc } = ctx.query;
+  if (!ttc) {
+    return "Verificatie";
+  }
+
+  debugLog("ophalen verificatie bestelling met TTC " + ttc);
+  try{
+    
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: false,
+          klantBedrijf: false,
+          aankoper: false,
+          transportdienst: {
+            trackAndTraceFormat: true,
+          },
+          notification: false,
+        },
+        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}},
+        where: {trackAndTraceCode: ttc}});
+        if (!bestelling) {
+          debugLog("geen bestelling gevonden met TTC: " + ttc);
+          return "Verificatie";
+        }
+        console.log(bestelling);
+        return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
+    
+    
+  } catch (error: any) {
+    return "Verificatie";
+  }
+  
+};
+
 const checkBestellingExists = async (bestellingId: number) => {
   const bestelling = await bestellingRepository.findOne({
     where: {
@@ -170,6 +206,7 @@ export default {
   getBestellingenVanBedrijf,
   getById,
   getByTrackAndTrace,
+  getVerificatieByTrackAndTrace,
   checkBestellingExists,
   getBedrijfIdFromBestelling
 };
