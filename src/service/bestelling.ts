@@ -11,6 +11,8 @@ import { Winkelmand } from "../entity/Winkelmand";
 import { BesteldProduct } from "../entity/BesteldProduct";
 import { WinkelmandProducten } from "../entity/WinkelmandProducten";
 import { Product } from "../entity/Product";
+import { Notification } from "../entity/Notification";
+import { Timestamp } from "typeorm";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -20,6 +22,8 @@ const bestellingRepository = AppDataSource.getRepository(Bestelling);
 const bedrijfRepository = AppDataSource.getRepository(Bedrijf);
 const doosRepository = AppDataSource.getRepository(Doos);
 const winkelmandRepository = AppDataSource.getRepository(Winkelmand);
+const userRepository = AppDataSource.getRepository(User);
+const notificationRepository = AppDataSource.getRepository(Notification);
 const winkelmandProductRepository =
   AppDataSource.getRepository(WinkelmandProducten);
 const productRepository = AppDataSource.getRepository(Product);
@@ -386,6 +390,8 @@ const postBestelling = async (ctx: Koa.Context) => {
     try {
       // save bestelling and the linked besteldeProducten together (cascade)
       const savedBestelling = await bestellingRepository.save(bestelling);
+
+      
       debugLog(
         "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
       );
@@ -408,6 +414,21 @@ const postBestelling = async (ctx: Koa.Context) => {
           // debugLog("postBestelling: removed winkelmandProduct with id: " + winkelmandProduct.product.productId)
         }
       }
+
+      const notification : Notification = new Notification();
+      notification.aankoper = aankoper;
+      notification.bestelling = bestelling;
+
+      notification.creationDate= new Date();
+      notification.isBekeken = false;
+
+      debugLog(notification.creationDate);
+   
+      notificationRepository.save(notification);
+
+      
+      
+
 
       // commit transaction now:
       await queryRunner.commitTransaction()
