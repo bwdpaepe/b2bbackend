@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
+import { BesteldProduct } from "./BesteldProduct";
 import { Categorie } from "./Categorie";
 
 @Entity({ name: "producten" })
@@ -26,6 +28,9 @@ export class Product {
   })
   @JoinColumn({ name: "categorie_id" })
   categorie: Categorie;
+
+  @OneToMany(() => BesteldProduct, (besteldeProduct) => besteldeProduct.product)
+  besteldeProducten: BesteldProduct[];
 
   @Column({ name: "NAAM", length: 255, unique: true })
   naam: string;
