@@ -163,7 +163,6 @@ const getVerificatieByTrackAndTrace = async (ctx: any) => {
           debugLog("geen bestelling gevonden met TTC: " + ttc);
           return "Verificatie";
         }
-        console.log(bestelling);
         return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
     
     
