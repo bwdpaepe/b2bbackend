@@ -184,7 +184,6 @@ const getNewNotificationsCountSinceLastCheck = async (ctx: Koa.Context) => {
 
     sessionInfo.lastNotificationCheck = new Date();
     await sessionService.updateSession(sessionInfo);
-    debugLog("tot hier ok")
 
   ctx.body = { newNotificationsCountSinceLastCheck: newNotificationsCount };
 

@@ -14,7 +14,7 @@ export class Notification {
   @PrimaryGeneratedColumn({ name: "ID" })
   notificationId: number;
 
-  @Column({ name: "CREATIONDATE", type: "date" })
+  @Column({ name: "CREATIONDATE", type: "datetime" })
   creationDate: Date;
 
   @Column({ name: "ISBEKENEN", type: "boolean" })
