@@ -15,6 +15,8 @@ import { Winkelmand } from "./entity/Winkelmand";
 import { WinkelmandProducten } from "./entity/WinkelmandProducten";
 import { foreignkeysWinkelmandproducten1682931009287 } from "./migrations/1682931009287-foreignkeysWinkelmandproducten";
 import { addCategorie1683221364822 } from "./migrations/1683221364822-addCategorie";
+import { Transportdienst } from "./entity/Transportdienst";
+import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
 import { Categorie } from "./entity/Categorie";
 import { relationBedrijfCategorie1683221414398 } from "./migrations/1683221414398-relationBedrijfCategorie";
 import { categorieSeeding1683221473794 } from "./migrations/1683221473794-categorieSeeding";
@@ -41,6 +43,8 @@ export default new DataSource({
     Product,
     Winkelmand,
     WinkelmandProducten,
+    Transportdienst, 
+    TrackAndTraceFormat,
     Categorie,
     Doos,
     Dimensie,

@@ -21,6 +21,9 @@ export const getBestellingByTrackAndTrace = async (ctx: Koa.Context) => {
   ctx.body = await bestellingService.getByTrackAndTrace(ctx);
 };
 
+// GET track and trace
+export const getVerificatieByTrackAndTrace = async (ctx: Koa.Context) => {
+  ctx.body = await bestellingService.getVerificatieByTrackAndTrace(ctx)};
 // POST bestelling
 export const postBestelling = async (ctx: Koa.Context) => {
   ctx.body = await bestellingService.postBestelling(ctx);
@@ -37,6 +40,10 @@ export default function installBestellingRoutes(app: any) {
   // get bestelling by track & trace code
   // example http://localhost:9000/api/bestellingen/track-and-trace?ttc=123456789&verify=9000
   router.get("/track-and-trace", validateService.validateTrackAndTrace, getBestellingByTrackAndTrace);
+
+  // get bestelling verificatie by track & trace code
+  // example http://localhost:9000/api/bestellingen/track-and-trace?ttc=123456789
+  router.get("/verificatie", getVerificatieByTrackAndTrace);
 
   /**
    * PROTECTED ROUTES

@@ -18,7 +18,6 @@ const userCanAccessBestelling = async (ctx: any, next: any) => {
     );
     if(await bestellingService.checkBestellingExists(bestellingId)) {
       const checkBedrijfId = await bestellingService.getBedrijfIdFromBestelling(bestellingId);
-      console.log(checkBedrijfId);
       if(checkBedrijfId.klantBedrijf.bedrijfId !== bedrijfId) {
         throw new Error('bestelling kan niet opgehaald worden');
       }
@@ -38,8 +37,7 @@ const validateTrackAndTrace = (ctx: any, next: any) => {
   try{
     const{ttc, verify} = ctx.query;
     const querySchema = {ttc: ttc, verify: verify};
-    const result = TrackAndTraceSchema.parse(querySchema);
-    console.log(result);
+    TrackAndTraceSchema.parse(querySchema);
   }
   catch (error: any) {
     if (error instanceof ZodError) {
