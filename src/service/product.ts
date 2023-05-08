@@ -30,6 +30,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf    
     });
 
     if (!products || !products.length) {
@@ -39,7 +40,37 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       );
     }
 
+    if (products.length === 0) {
+      debugLog("No products found for company with Id:  " + bedrijfId);
+      return (ctx.status = 204);
+    }
+
     return products;
+  } catch (error: any) {
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
+
+const getProductByProductId = async (ctx: Koa.Context) => {
+  try {
+    debugLog("GET product with productId " + ctx.params.productId);
+    const productId = Number(ctx.params.productId);
+
+    if (!productId) {
+      throw new Error("No correct productId was provided");
+    }
+
+    const product = await productRepository.findOne({
+      where: { productId: productId },
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf 
+    });
+
+    if (!product) {
+      debugLog("No product found with Id: " + productId);
+      return (ctx.status = 204);
+    }
+
+    return product;
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }

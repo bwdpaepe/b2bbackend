@@ -20,7 +20,7 @@
     "start:prod": "node src/outdir/src/server.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration": "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:run",
-    "seed": "ts-node-dev ./src/seeding/productSeeding.ts",
+    "seed": "ts-node-dev  ./src/seeding/seeding.ts",
     "revert": "npx typeorm-ts-node-commonjs -d ./src/migration-data-source.ts migration:revert"
   },
   "name": "SDP2_TO3_webservice",
@@ -55,7 +55,8 @@
     "tsutils": "^3.21.0",
     "typeorm": "^0.3.10",
     "typescript": "^5.0.3",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "zod": "^3.21.4"
   },
   "repository": {
     "type": "git",

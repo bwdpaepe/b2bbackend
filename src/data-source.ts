@@ -8,6 +8,14 @@ import { Bestelling } from "./entity/Bestelling";
 import { Notification } from "./entity/Notification";
 import { Session } from "./entity/Session";
 import { Product } from "./entity/Product";
+import { Winkelmand } from "./entity/Winkelmand";
+import { WinkelmandProducten } from "./entity/WinkelmandProducten";
+import { Transportdienst } from "./entity/Transportdienst";
+import { TrackAndTraceFormat } from "./entity/TrackAndTraceFormat";
+import { Categorie } from "./entity/Categorie";
+import { Doos } from "./entity/Doos";
+import { Dimensie } from "./entity/Dimensie";
+import { BesteldProduct } from "./entity/BesteldProduct";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -18,7 +26,22 @@ export const AppDataSource = new DataSource({
   database: config.database.database,
   synchronize: false,
   logging: false,
-  entities: [Bedrijf, User, Bestelling, Product, Notification, Session],
+  entities: [
+    Bedrijf,
+    User,
+    Bestelling,
+    Product,
+    Notification,
+    Session,
+    Winkelmand,
+    WinkelmandProducten,
+    Transportdienst, 
+    TrackAndTraceFormat,
+    Categorie,
+    Doos,
+    Dimensie,
+    BesteldProduct,
+  ],
   migrations: [],
   subscribers: [],
 });

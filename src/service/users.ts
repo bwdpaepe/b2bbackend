@@ -36,7 +36,7 @@ const getAllUsers = async () => {
  * Get user via userId => nodig in service\auth.ts
  */
 const getUserById = async (userId: any) => {
-  debugLog("GET user with userId " + userId);
+  // debugLog("GET user with userId " + userId);
   try {
     const user = await usersRepository.findOne({
       where: { userId: Number(userId)},
