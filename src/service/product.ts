@@ -3,7 +3,7 @@ import { logger } from "../server";
 import { AppDataSource } from "../data-source";
 import { Product } from "../entity/Product";
 
-const debugLog = (message: any) => {
+const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
 };
 
@@ -21,8 +21,8 @@ const checkProductEndpoint = async () => {
 
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET producten with bedrijfId " + ctx.params.bedrijfId);
-    const bedrijfId = Number(ctx.params.bedrijfId);
+    debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
+    const bedrijfId = Number(ctx.query.bedrijfId);
 
     if (!bedrijfId) {
       throw new Error("No correct bedrijfId was provided");
@@ -33,9 +33,11 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
       relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf    
     });
 
-    if (!products || products.length === 0) {
-      debugLog("No products found for company with Id:  " + bedrijfId);
-      return (ctx.status = 204);
+    if (!products || !products.length) {
+      return (
+        (ctx.status = 204),
+        (ctx.body = { error: "No products found for bedrijfId " + bedrijfId })
+      );
     }
 
     if (products.length === 0) {
@@ -77,5 +79,4 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
-  getProductByProductId,
 };
