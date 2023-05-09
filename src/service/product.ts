@@ -79,4 +79,5 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
+  getProductByProductId,
 };
