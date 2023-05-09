@@ -21,8 +21,8 @@ const checkProductEndpoint = async () => {
 
 const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
   try {
-    debugLog("GET producten with bedrijfId " + ctx.query.bedrijfId);
-    const bedrijfId = Number(ctx.query.bedrijfId);
+    debugLog("GET producten with bedrijfId " + ctx.params.bedrijfId);
+    const bedrijfId = Number(ctx.params.bedrijfId);
 
     if (!bedrijfId) {
       throw new Error("No correct bedrijfId was provided");
@@ -30,7 +30,7 @@ const getAllProductsByBedrijfId = async (ctx: Koa.Context) => {
 
     const products = await productRepository.find({
       where: { bedrijf: { bedrijfId: bedrijfId } },
-      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf    
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf
     });
 
     if (!products || !products.length) {
@@ -62,7 +62,7 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 
     const product = await productRepository.findOne({
       where: { productId: productId },
-      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf 
+      relations: ["categorie", "bedrijf"], // todo: enkel bedrijfId en naam ophalen van bedrijf
     });
 
     if (!product) {
@@ -79,4 +79,5 @@ const getProductByProductId = async (ctx: Koa.Context) => {
 export default {
   checkProductEndpoint,
   getAllProductsByBedrijfId,
+  getProductByProductId,
 };
