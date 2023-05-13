@@ -3,11 +3,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   JoinColumn,
 } from "typeorm";
 import { Bedrijf } from "./Bedrijf";
 import { Dimensie } from "./Dimensie";
+import { Bestelling } from "./Bestelling";
 
 @Entity({ name: "dozen" })
 export class Doos {
@@ -21,6 +23,9 @@ export class Doos {
   @OneToOne(() => Dimensie, { eager: true , cascade: true}) // always eager load the Dimensie
   @JoinColumn({ name: "dimensie" })
   dimensie: Dimensie;
+
+  @OneToMany(() => Bestelling, (bestelling) => bestelling.doos)
+  bestellingen: Bestelling[];
 
   @Column({
     name: "DOOSTYPE",
