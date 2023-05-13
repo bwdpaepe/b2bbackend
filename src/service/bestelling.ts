@@ -13,6 +13,7 @@ import { WinkelmandProducten } from "../entity/WinkelmandProducten";
 import { Product } from "../entity/Product";
 import { Notification } from "../entity/Notification";
 import { Timestamp } from "typeorm";
+import { string } from "zod";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -489,6 +490,78 @@ const postBestelling = async (ctx: Koa.Context) => {
   }
 };
 
+const updateBestelling = async (ctx: Koa.Context) => {
+  try {
+
+    const {
+      leveradres,
+      doosId
+    } = (ctx.request.body as {leveradres: {straat: string;nummer: string;stad: string;postcode: string;land:string;}, doosId: number});
+    
+    const bestellingId = ctx.params.id;
+
+    if (bestellingId) {
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: true,
+          doos: true,
+        },
+        where: { bestellingId: bestellingId },
+      });
+
+      console.log(bestelling);
+
+      if (!bestelling) {
+        debugLog("geen bestelling gevonden met Id: " + bestellingId);
+        return (
+          (ctx.status = 204),
+          (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+        );
+      }
+
+      // fetch doos from database
+      const doos = await doosRepository.findOne({
+        where: {
+          doosId: doosId,
+        },
+        relations: ["bedrijf"],
+      });
+      // if doos does not exist, return error
+      if (!doos) {
+        debugLog("putBestelling: doos does not exist");
+        throw new Error("Doos bestaat niet");
+      }
+      // check if doos belongs to leverancierbedrijf
+      if (doos.bedrijf.bedrijfId !== bestelling.leverancierBedrijf.bedrijfId) {
+        debugLog("putBestelling: doos does not belong to leverancierbedrijf");
+        throw new Error("Doos behoort niet tot leverancierbedrijf");
+      }
+
+      bestelling.leveradresLand = leveradres.land;
+      bestelling.leveradresNummer = leveradres.nummer;
+      bestelling.leveradresPostcode = leveradres.postcode;
+      bestelling.leveradresStad = leveradres.stad;
+      bestelling.leveradresStraat= leveradres.straat;
+      bestelling.doos = doos;
+
+      await bestellingRepository.save(bestelling);
+      debugLog("bestelling geupdated");
+      ctx.status = 200;
+      return;
+
+      
+    } else {
+      return (
+        (ctx.status = 404),
+        (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+      );
+    }
+  } catch (error: any) {
+    debugLog("putBestelling: error: " + error.message + ". Bestelling is NOT saved");
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
@@ -498,4 +571,5 @@ export default {
   checkBestellingExists,
   getBedrijfIdFromBestelling,
   postBestelling,
+  updateBestelling,
 };
