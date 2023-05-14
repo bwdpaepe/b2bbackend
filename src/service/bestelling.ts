@@ -514,7 +514,7 @@ const updateBestelling = async (ctx: Koa.Context) => {
       if (!bestelling) {
         debugLog("geen bestelling gevonden met Id: " + bestellingId);
         return (
-          (ctx.status = 204),
+          (ctx.status = 404),
           (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
         );
       }
@@ -552,12 +552,12 @@ const updateBestelling = async (ctx: Koa.Context) => {
       
     } else {
       return (
-        (ctx.status = 404),
+        (ctx.status = 400),
         (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
       );
     }
   } catch (error: any) {
-    debugLog("putBestelling: error: " + error.message + ". Bestelling is NOT saved");
+    debugLog("putBestelling: error: " + error.message + ". Bestelling is NOT updated");
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
