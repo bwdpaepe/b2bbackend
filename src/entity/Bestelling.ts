@@ -83,4 +83,7 @@ export class Bestelling {
   getStatusDescription(): string {
     return BestellingStatus[this.status];
   }
+
+  // transient property totalPrice
+  totalPrice: number;
 }

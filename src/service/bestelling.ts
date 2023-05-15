@@ -122,6 +122,18 @@ const getById = async (ctx: Koa.Context) => {
         );
       }
 
+      // Calculate the subtotal for each besteldProduct (aantal * eenheidsprijs)
+      if(bestelling && bestelling.besteldeProducten) {
+        bestelling.besteldeProducten.forEach((bp) => {
+          bp.subtotal = bp.aantal * bp.eenheidsprijs;
+        });
+      }
+      
+      // Calculate the total price for each bedrijfId and store it in an array 'totalPrice'
+      bestelling.totalPrice = bestelling.besteldeProducten.reduce((sum, bp)=>{
+        return (sum += bp.subtotal);
+      }, 0.0);
+
       return { ...bestelling, status: BestellingStatus[bestelling.status] };
     } else {
       return (
