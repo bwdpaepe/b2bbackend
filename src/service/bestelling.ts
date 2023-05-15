@@ -96,10 +96,20 @@ const getById = async (ctx: Koa.Context) => {
           doos: true,
         },
         select: {
-          leverancierBedrijf: { bedrijfId: true },
+          leverancierBedrijf: { bedrijfId: true, naam: true },
           aankoper: { firstname: true, lastname: true, email: true },
           transportdienst: { naam: true },
           notification: { creationDate: true },
+          besteldeProducten: {
+            id: true,
+            aantal: true,
+            naam: true,
+            eenheidsprijs: true,
+            product: {
+              omschrijving: true,
+              pictureFilename: true,
+            },
+          },
         },
         where: { bestellingId: bestellingId },
       });

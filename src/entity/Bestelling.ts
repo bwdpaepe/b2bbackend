@@ -40,9 +40,7 @@ export class Bestelling {
   transportdienst: Transportdienst;
 
   //Many to one to Doos
-  @ManyToOne(() => Doos,
-  (doos) => doos.bestellingen
-  )
+  @ManyToOne(() => Doos)
   @JoinColumn({ name: "Doos" })
   doos: Doos;
 
