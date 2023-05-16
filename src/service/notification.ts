@@ -58,6 +58,24 @@ async function fetchNotifications(userId: number, limit?: number) {
   const results = await query.getRawMany<NotificationListEntry>();
   return results;
 }
+async function getNotificationByID(ctx : Koa.Context){
+  const {userId} = ctx.state.session;
+  try {
+    const notification = await notificationRepository.findOne({where : {notificationId : ctx.params.id}, relations : {aankoper : true, bestelling: true}});
+    if (notification && notification.aankoper.userId === userId) {
+      notification.isBekeken = true;
+      await notificationRepository.save(notification);
+      return ctx.body = notification
+    }
+    
+    return ctx.body = {error: "deze notificatie kon niet opgehaald worden"}, ctx.status = 404;
+    
+  } catch (error) {
+    return ctx.body = {error: "deze notificatie kon niet opgehaald worden"}, ctx.status = 404;
+  }
+
+
+}
 
 /**
  * Helper function to process the results of a query to the notification table.
@@ -200,4 +218,5 @@ export default {
   getNotificationsForUser,
   getUnreadNotificationsCount,
   getNewNotificationsCountSinceLastCheck,
+  getNotificationByID
 };
