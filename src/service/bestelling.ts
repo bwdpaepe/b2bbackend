@@ -543,6 +543,14 @@ const updateBestelling = async (ctx: Koa.Context) => {
         );
       }
 
+      if (bestelling.status !== BestellingStatus.GEPLAATST) {
+        debugLog("deze bestelling met Id: " + bestellingId + " kan niet gewijzigd worden");
+        return (
+          (ctx.status = 404),
+          (ctx.body = { error: "Deze bestelling kan niet gewijzigd worden" })
+        );
+      }
+
       // fetch doos from database
       const doos = await doosRepository.findOne({
         where: {
