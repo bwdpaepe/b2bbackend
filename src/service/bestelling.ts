@@ -13,6 +13,7 @@ import { WinkelmandProducten } from "../entity/WinkelmandProducten";
 import { Product } from "../entity/Product";
 import { Notification } from "../entity/Notification";
 import { Timestamp } from "typeorm";
+import { string } from "zod";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -87,12 +88,28 @@ const getById = async (ctx: Koa.Context) => {
           leverancierBedrijf: true,
           klantBedrijf: false,
           aankoper: true,
-          transportdienst: false,
-          notification: false,
+          transportdienst: true,
+          notification: true,
+          besteldeProducten: {
+            product: true,
+          },
+          doos: true,
         },
         select: {
-          leverancierBedrijf: { naam: true },
+          leverancierBedrijf: { bedrijfId: true, naam: true },
           aankoper: { firstname: true, lastname: true, email: true },
+          transportdienst: { naam: true },
+          notification: { creationDate: true },
+          besteldeProducten: {
+            id: true,
+            aantal: true,
+            naam: true,
+            eenheidsprijs: true,
+            product: {
+              omschrijving: true,
+              pictureFilename: true,
+            },
+          },
         },
         where: { bestellingId: bestellingId },
       });
@@ -104,6 +121,18 @@ const getById = async (ctx: Koa.Context) => {
           (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
         );
       }
+
+      // Calculate the subtotal for each besteldProduct (aantal * eenheidsprijs)
+      if(bestelling && bestelling.besteldeProducten) {
+        bestelling.besteldeProducten.forEach((bp) => {
+          bp.subtotal = bp.aantal * bp.eenheidsprijs;
+        });
+      }
+      
+      // Calculate the total price for each bedrijfId and store it in an array 'totalPrice'
+      bestelling.totalPrice = bestelling.besteldeProducten.reduce((sum, bp)=>{
+        return (sum += bp.subtotal);
+      }, 0.0);
 
       return { ...bestelling, status: BestellingStatus[bestelling.status] };
     } else {
@@ -485,6 +514,86 @@ const postBestelling = async (ctx: Koa.Context) => {
   }
 };
 
+const updateBestelling = async (ctx: Koa.Context) => {
+  try {
+
+    const {
+      leveradres,
+      doosId
+    } = (ctx.request.body as {leveradres: {straat: string;nummer: string;stad: string;postcode: string;land:string;}, doosId: number});
+    
+    const bestellingId = ctx.params.id;
+
+    if (bestellingId) {
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: true,
+          doos: true,
+        },
+        where: { bestellingId: bestellingId },
+      });
+
+      console.log(bestelling);
+
+      if (!bestelling) {
+        debugLog("geen bestelling gevonden met Id: " + bestellingId);
+        return (
+          (ctx.status = 404),
+          (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+        );
+      }
+
+      if (bestelling.status !== BestellingStatus.GEPLAATST) {
+        debugLog("deze bestelling met Id: " + bestellingId + " kan niet gewijzigd worden");
+        return (
+          (ctx.status = 404),
+          (ctx.body = { error: "Deze bestelling kan niet gewijzigd worden" })
+        );
+      }
+
+      // fetch doos from database
+      const doos = await doosRepository.findOne({
+        where: {
+          doosId: doosId,
+        },
+        relations: ["bedrijf"],
+      });
+      // if doos does not exist, return error
+      if (!doos) {
+        debugLog("putBestelling: doos does not exist");
+        throw new Error("Doos bestaat niet");
+      }
+      // check if doos belongs to leverancierbedrijf
+      if (doos.bedrijf.bedrijfId !== bestelling.leverancierBedrijf.bedrijfId) {
+        debugLog("putBestelling: doos does not belong to leverancierbedrijf");
+        throw new Error("Doos behoort niet tot leverancierbedrijf");
+      }
+
+      bestelling.leveradresLand = leveradres.land;
+      bestelling.leveradresNummer = leveradres.nummer;
+      bestelling.leveradresPostcode = leveradres.postcode;
+      bestelling.leveradresStad = leveradres.stad;
+      bestelling.leveradresStraat= leveradres.straat;
+      bestelling.doos = doos;
+
+      await bestellingRepository.save(bestelling);
+      debugLog("bestelling geupdated");
+      ctx.status = 200;
+      return;
+
+      
+    } else {
+      return (
+        (ctx.status = 400),
+        (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+      );
+    }
+  } catch (error: any) {
+    debugLog("putBestelling: error: " + error.message + ". Bestelling is NOT updated");
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
+
 export default {
   checkBestellingEndpoint,
   getBestellingenVanBedrijf,
@@ -494,4 +603,5 @@ export default {
   checkBestellingExists,
   getBedrijfIdFromBestelling,
   postBestelling,
+  updateBestelling,
 };

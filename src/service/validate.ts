@@ -1,4 +1,5 @@
 import { TrackAndTraceSchema } from "../schema/track-and-trace.shema";
+import { BestellingUpdateSchema } from "../schema/bestelling-update.schema";
 import { ZodError} from "zod";
 
 import { logger } from "../server";
@@ -48,7 +49,23 @@ const validateTrackAndTrace = (ctx: any, next: any) => {
   return next();
 }
 
+const validateBestellingUpdate = (ctx: any, next: any) => {
+  try{
+    const{leveradres, doosId} = ctx.request.body;
+    const querySchema = {leveradres: leveradres, doosId: doosId};
+    BestellingUpdateSchema.parse(querySchema);
+  }
+  catch (error: any) {
+    if (error instanceof ZodError) {
+      return (ctx.status = 403), (ctx.body = { error: ([error.issues.map((issue) => (issue.message))]).join(',') }); // 403 = Invalid format
+    }
+    return (ctx.status = 400), (ctx.body = { error: error.message }); // 400 = Bad request
+  }
+  return next();
+}
+
 export default{
   userCanAccessBestelling,
   validateTrackAndTrace,
+  validateBestellingUpdate,
 };

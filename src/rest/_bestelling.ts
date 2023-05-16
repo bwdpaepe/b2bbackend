@@ -28,6 +28,11 @@ export const getVerificatieByTrackAndTrace = async (ctx: Koa.Context) => {
 export const postBestelling = async (ctx: Koa.Context) => {
   ctx.body = await bestellingService.postBestelling(ctx);
 };
+// PUT bestelling
+export const updateBestelling = async (ctx: Koa.Context) => {
+  ctx.body = await bestellingService.updateBestelling(ctx);
+};
+
 
 export default function installBestellingRoutes(app: any) {
   const router = new Router({
@@ -58,6 +63,11 @@ export default function installBestellingRoutes(app: any) {
   // post bestelling
   // example: http://localhost:9000/api/bestellingen?leverancierbedrijfId=3&doosId=8&leveradresStraat=test_straat&leveradresNummer=test_nummer&leveradresPostcode=test_postcode&leveradresStad=test_stad&leveradresLand=test_land
   router.post("/", authService.requireAuthentication, postBestelling);
+
+  // update geplaatste bestelling: wijzig leveradres en verpakking
+  // todo validate status (from id), leveradres, verpakking
+  router.put(
+    "/:id", authService.requireAuthentication, validateService.validateBestellingUpdate, updateBestelling);
 
   app.use(router.routes()).use(router.allowedMethods());
   logger.debug(`Installation of bestellingen Route (_bestelling.ts) completed`);

@@ -29,4 +29,7 @@ export class BesteldProduct {
   @ManyToOne(() => Product, (product) => product.besteldeProducten)
   @JoinColumn({ name: "PRODUCT_ID" })
   product: Product;
+
+  // transient property subtotaal
+  subtotal: number;
 }
