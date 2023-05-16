@@ -81,7 +81,7 @@ export default function installNotificationRoutes(app: any) {
   router.get(
     "/:id",
     authService.requireAuthentication,
-    getNewNotificationsCount
+    getNotificationByID
   );
 
   app.use(router.routes()).use(router.allowedMethods());
