@@ -52,7 +52,7 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           aankoper: true,
           transportdienst: false,
           notification: false,
-          doos: false,
+          doos: true,
         },
         select: {
           leverancierBedrijf: { naam: true, bedrijfId: true },
@@ -525,7 +525,14 @@ const postBestelling = async (ctx: Koa.Context) => {
 
 const updateBestelling = async (ctx: Koa.Context) => {
   try {
-    const { leveradres, doosId } = ctx.request.body as {
+    const doosId = Number(ctx.query.doosId);
+    const straat = String(ctx.query.leveradresStraat);
+    const nummer = String(ctx.query.leveradresNummer);
+    const postcode = String(ctx.query.leveradresPostcode);
+    const stad = String(ctx.query.leveradresStad);
+    const land = String(ctx.query.leveradresLand);
+
+    /*const { leveradres, doosId } = ctx.request.body as {
       leveradres: {
         straat: string;
         nummer: string;
@@ -534,7 +541,7 @@ const updateBestelling = async (ctx: Koa.Context) => {
         land: string;
       };
       doosId: number;
-    };
+    };*/
 
     const bestellingId = ctx.params.id;
 
@@ -587,11 +594,11 @@ const updateBestelling = async (ctx: Koa.Context) => {
         throw new Error("Doos behoort niet tot leverancierbedrijf");
       }
 
-      bestelling.leveradresLand = leveradres.land;
-      bestelling.leveradresNummer = leveradres.nummer;
-      bestelling.leveradresPostcode = leveradres.postcode;
-      bestelling.leveradresStad = leveradres.stad;
-      bestelling.leveradresStraat = leveradres.straat;
+      bestelling.leveradresLand = land;
+      bestelling.leveradresNummer = nummer;
+      bestelling.leveradresPostcode = postcode;
+      bestelling.leveradresStad = stad;
+      bestelling.leveradresStraat = straat;
       bestelling.doos = doos;
 
       await bestellingRepository.save(bestelling);
