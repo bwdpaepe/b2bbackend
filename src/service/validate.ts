@@ -55,8 +55,6 @@ const validateTrackAndTrace = (ctx: any, next: any) => {
 
 const validateBestellingUpdate = (ctx: any, next: any) => {
   try {
-    console.log(ctx.query);
-
     const querySchema = {
       leveradresStraat: ctx.query.leveradresStraat,
       leveradresNummer: ctx.query.leveradresNummer,
