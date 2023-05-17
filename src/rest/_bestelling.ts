@@ -78,7 +78,7 @@ export default function installBestellingRoutes(app: any) {
   router.put(
     "/update/:id",
     authService.requireAuthentication,
-    //validateService.validateBestellingUpdate,
+    validateService.validateBestellingUpdate,
     updateBestelling
   );
 

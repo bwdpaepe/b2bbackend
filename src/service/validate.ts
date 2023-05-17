@@ -1,10 +1,10 @@
 import { TrackAndTraceSchema } from "../schema/track-and-trace.shema";
 import { BestellingUpdateSchema } from "../schema/bestelling-update.schema";
-import { ZodError} from "zod";
+import { ZodError } from "zod";
 
 import { logger } from "../server";
 import authService from "./auth";
-import bestellingService from "../service/bestelling"
+import bestellingService from "../service/bestelling";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -12,59 +12,75 @@ const debugLog = (message: any, meta = {}) => {
 
 const userCanAccessBestelling = async (ctx: any, next: any) => {
   try {
-    const {bedrijfId} = ctx.state.session;
+    const { bedrijfId } = ctx.state.session;
     const bestellingId = ctx.params.id;
-    debugLog(
-      "GET bedrijf for a specific bestelling with id: " + bestellingId
-    );
-    if(await bestellingService.checkBestellingExists(bestellingId)) {
-      const checkBedrijfId = await bestellingService.getBedrijfIdFromBestelling(bestellingId);
-      if(checkBedrijfId.klantBedrijf.bedrijfId !== bedrijfId) {
-        throw new Error('bestelling kan niet opgehaald worden');
+    debugLog("GET bedrijf for a specific bestelling with id: " + bestellingId);
+    if (await bestellingService.checkBestellingExists(bestellingId)) {
+      const checkBedrijfId = await bestellingService.getBedrijfIdFromBestelling(
+        bestellingId
+      );
+      if (checkBedrijfId.klantBedrijf.bedrijfId !== bedrijfId) {
+        throw new Error("bestelling kan niet opgehaald worden");
       }
+    } else {
+      return (
+        (ctx.status = 404), (ctx.body = { error: "bestelling niet gevonden" })
+      );
     }
-    else {
-      return (ctx.status = 404), (ctx.body = {error: "bestelling niet gevonden"});
-    }
-    
-  }catch (error: any) {
+  } catch (error: any) {
     debugLog("Error in userCanAccessBestelling: " + error);
-    return (ctx.status = 400), (ctx.body = {error: error.message});
+    return (ctx.status = 400), (ctx.body = { error: error.message });
   }
   return next();
 };
 
 const validateTrackAndTrace = (ctx: any, next: any) => {
-  try{
-    const{ttc, verify} = ctx.query;
-    const querySchema = {ttc: ttc, verify: verify};
+  try {
+    const { ttc, verify } = ctx.query;
+    const querySchema = { ttc: ttc, verify: verify };
     TrackAndTraceSchema.parse(querySchema);
-  }
-  catch (error: any) {
+  } catch (error: any) {
     if (error instanceof ZodError) {
-      return (ctx.status = 403), (ctx.body = { error: ([error.issues.map((issue) => (issue.message))]).join(',') }); // 403 = Invalid format
+      return (
+        (ctx.status = 403),
+        (ctx.body = {
+          error: [error.issues.map((issue) => issue.message)].join(","),
+        })
+      ); // 403 = Invalid format
     }
     return (ctx.status = 400), (ctx.body = { error: error.message }); // 400 = Bad request
   }
   return next();
-}
+};
 
 const validateBestellingUpdate = (ctx: any, next: any) => {
-  try{
-    const{leveradres, doosId} = ctx.request.body;
-    const querySchema = {leveradres: leveradres, doosId: doosId};
+  try {
+    console.log(ctx.query);
+
+    const querySchema = {
+      leveradresStraat: ctx.query.leveradresStraat,
+      leveradresNummer: ctx.query.leveradresNummer,
+      leveradresPostcode: ctx.query.leveradresPostcode,
+      leveradresStad: ctx.query.leveradresStad,
+      leveradresLand: ctx.query.leveradresLand,
+      doosId: Number(ctx.query.doosId),
+    };
     BestellingUpdateSchema.parse(querySchema);
-  }
-  catch (error: any) {
+  } catch (error: any) {
     if (error instanceof ZodError) {
-      return (ctx.status = 403), (ctx.body = { error: ([error.issues.map((issue) => (issue.message))]).join(',') }); // 403 = Invalid format
+      return (
+        (ctx.status = 403),
+        (ctx.body = {
+          error: [error.issues.map((issue) => issue.message)].join(","),
+        })
+      ); // 403 = Invalid format
     }
     return (ctx.status = 400), (ctx.body = { error: error.message }); // 400 = Bad request
   }
   return next();
-}
+};
 
-export default{
+export default {
   userCanAccessBestelling,
   validateTrackAndTrace,
   validateBestellingUpdate,
