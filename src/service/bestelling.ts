@@ -589,6 +589,8 @@ const updateBestelling = async (ctx: Koa.Context) => {
         throw new Error("Doos bestaat niet");
       }
       // check if doos belongs to leverancierbedrijf
+      console.log(doos.bedrijf.bedrijfId);
+      console.log(bestelling.leverancierBedrijf.bedrijfId);
       if (doos.bedrijf.bedrijfId !== bestelling.leverancierBedrijf.bedrijfId) {
         debugLog("putBestelling: doos does not belong to leverancierbedrijf");
         throw new Error("Doos behoort niet tot leverancierbedrijf");
