@@ -31,7 +31,7 @@ export class addCategorie1683221364822 implements MigrationInterface {
     );
 
     await queryRunner.addColumn(
-      "producten",
+      "Producten",
       new TableColumn({
         name: "categorie_id",
         type: "BIGINT",
@@ -40,7 +40,7 @@ export class addCategorie1683221364822 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      "producten",
+      "Producten",
       new TableForeignKey({
         columnNames: ["categorie_id"],
         referencedColumnNames: ["id"],
@@ -52,8 +52,8 @@ export class addCategorie1683221364822 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey("producten", "categorie_id");
-    await queryRunner.dropColumn("producten", "categorie_id");
+    await queryRunner.dropForeignKey("Producten", "categorie_id");
+    await queryRunner.dropColumn("Producten", "categorie_id");
     await queryRunner.dropTable("categorie");
   }
 }

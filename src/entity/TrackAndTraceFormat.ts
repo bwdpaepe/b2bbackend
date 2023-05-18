@@ -1,7 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Transportdienst } from "./Transportdienst";
 
-@Entity({name: "tracktraceformats"})
+@Entity({name: "TrackTraceFormats"})
 export class TrackAndTraceFormat {
   @PrimaryGeneratedColumn({name: "ID"})
   trackAndTraceFormatId: number;

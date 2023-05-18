@@ -58,7 +58,7 @@ export class AddSessions1681898251992 implements MigrationInterface {
         await queryRunner.createForeignKey("session", new TableForeignKey({
             columnNames: ["userId"],
             referencedColumnNames: ["ID"],
-            referencedTableName: "gebruikers",
+            referencedTableName: "Gebruikers",
             onDelete: "NO ACTION",
             onUpdate: "NO ACTION"
 

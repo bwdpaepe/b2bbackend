@@ -30,6 +30,10 @@ const getNewNotificationsCount = async (ctx: Koa.Context) => {
   ctx.body = await notificationService.getNewNotificationsCountSinceLastCheck(ctx);
 };
 
+const getNotificationByID = async (ctx: Koa.Context) => {
+  ctx.body = await notificationService.getNotificationByID(ctx);
+};
+
 export default function installNotificationRoutes(app: any) {
   const router = new Router({
     prefix: "/notifications",
@@ -55,7 +59,6 @@ export default function installNotificationRoutes(app: any) {
   router.get(
     "/",
     authService.requireAuthentication,
-    authService.checkRolePermission(Functions.AANKOPER),
     getNotificationsForUser
   );
 
@@ -64,7 +67,6 @@ export default function installNotificationRoutes(app: any) {
   router.get(
     "/unread",
     authService.requireAuthentication,
-    authService.checkRolePermission(Functions.AANKOPER),
     getUnreadNotificationsCount
   );
 
@@ -73,8 +75,13 @@ export default function installNotificationRoutes(app: any) {
   router.get(
     "/new",
     authService.requireAuthentication,
-    authService.checkRolePermission(Functions.AANKOPER),
     getNewNotificationsCount
+  );
+
+  router.get(
+    "/:id",
+    authService.requireAuthentication,
+    getNotificationByID
   );
 
   app.use(router.routes()).use(router.allowedMethods());
