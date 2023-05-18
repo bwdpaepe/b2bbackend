@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
 export class AlterProducts1682016268609 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.addColumns("producten", [
+    await queryRunner.addColumns("Producten", [
       new TableColumn({
         name: "voorraad",
         type: "integer",
@@ -22,7 +22,7 @@ export class AlterProducts1682016268609 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumns("producten", [
+    await queryRunner.dropColumns("Producten", [
       new TableColumn({
         name: "voorraad",
         type: "integer",

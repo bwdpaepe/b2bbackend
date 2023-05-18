@@ -5,7 +5,7 @@ export class foreignkeysWinkelmandproducten1682931009287 implements MigrationInt
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createForeignKey("winkelmand", new TableForeignKey(                    {
             name: "user_id",
-            referencedTableName: "gebruikers",
+            referencedTableName: "Gebruikers",
             referencedColumnNames: ["ID"],
             columnNames:["user_id"],
             onDelete: "CASCADE",
@@ -28,7 +28,7 @@ export class foreignkeysWinkelmandproducten1682931009287 implements MigrationInt
         await queryRunner.createForeignKey("winkelmand_producten", new TableForeignKey(       
             {
                 name: "producten_winkelmand",
-                referencedTableName:"producten",
+                referencedTableName:"Producten",
                 referencedColumnNames:["ID"],
                 columnNames:["product_id"],
                 onDelete:"CASCADE",

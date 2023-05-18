@@ -9,7 +9,7 @@ import {
 import { Bedrijf } from "./Bedrijf";
 import { Dimensie } from "./Dimensie";
 
-@Entity({ name: "dozen" })
+@Entity({ name: "Dozen" })
 export class Doos {
   @PrimaryGeneratedColumn({ name: "ID" })
   doosId: number;

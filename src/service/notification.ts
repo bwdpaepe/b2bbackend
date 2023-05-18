@@ -65,11 +65,15 @@ async function getNotificationByID(ctx : Koa.Context){
     if (notification && notification.aankoper.userId === userId) {
       notification.isBekeken = true;
       await notificationRepository.save(notification);
-      return ctx.body = notification
+      return ctx.body = {
+      notificationID: notification.notificationId,
+      creationDate: notification.creationDate,
+      bestellingId: notification.bestelling.bestellingId,    
+      bestellingStatus: BestellingStatus[notification.bestelling.status], // Map the int to its corresponding enum string
+      trackAndTraceCode: notification.bestelling.trackAndTraceCode
     }
-    
-    return ctx.body = {error: "deze notificatie kon niet opgehaald worden"}, ctx.status = 404;
-    
+  }
+        
   } catch (error) {
     return ctx.body = {error: "deze notificatie kon niet opgehaald worden"}, ctx.status = 404;
   }

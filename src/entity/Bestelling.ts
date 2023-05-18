@@ -15,7 +15,7 @@ import { Notification } from "./Notification";
 import { Transportdienst } from "./Transportdienst";
 import { User } from "./User";
 
-@Entity({ name: "bestelling" })
+@Entity({ name: "BESTELLING" })
 export class Bestelling {
   @PrimaryGeneratedColumn({ name: "ID" })
   bestellingId: number;

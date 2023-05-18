@@ -10,7 +10,7 @@ import { Bedrijf } from "./Bedrijf";
 import { BesteldProduct } from "./BesteldProduct";
 import { Categorie } from "./Categorie";
 
-@Entity({ name: "producten" })
+@Entity({ name: "Producten" })
 export class Product {
   @PrimaryGeneratedColumn({ name: "ID" })
   productId: number;
