@@ -52,10 +52,12 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           aankoper: true,
           transportdienst: false,
           notification: false,
+          doos: true,
         },
         select: {
-          leverancierBedrijf: { naam: true },
+          leverancierBedrijf: { naam: true, bedrijfId: true },
           aankoper: { firstname: true, lastname: true, email: true },
+          doos: { doosId: true, naam: true },
         },
         where: { klantBedrijf: { bedrijfId: bedrijfId } },
       });
@@ -123,14 +125,14 @@ const getById = async (ctx: Koa.Context) => {
       }
 
       // Calculate the subtotal for each besteldProduct (aantal * eenheidsprijs)
-      if(bestelling && bestelling.besteldeProducten) {
+      if (bestelling && bestelling.besteldeProducten) {
         bestelling.besteldeProducten.forEach((bp) => {
           bp.subtotal = bp.aantal * bp.eenheidsprijs;
         });
       }
-      
+
       // Calculate the total price for each bedrijfId and store it in an array 'totalPrice'
-      bestelling.totalPrice = bestelling.besteldeProducten.reduce((sum, bp)=>{
+      bestelling.totalPrice = bestelling.besteldeProducten.reduce((sum, bp) => {
         return (sum += bp.subtotal);
       }, 0.0);
 
@@ -227,31 +229,33 @@ const getVerificatieByTrackAndTrace = async (ctx: any) => {
   }
 
   debugLog("ophalen verificatie bestelling met TTC " + ttc);
-  try{
-    
-      const bestelling: Bestelling = await bestellingRepository.findOne({
-        relations: {
-          leverancierBedrijf: false,
-          klantBedrijf: false,
-          aankoper: false,
-          transportdienst: {
-            trackAndTraceFormat: true,
-          },
-          notification: false,
+  try {
+    const bestelling: Bestelling = await bestellingRepository.findOne({
+      relations: {
+        leverancierBedrijf: false,
+        klantBedrijf: false,
+        aankoper: false,
+        transportdienst: {
+          trackAndTraceFormat: true,
         },
-        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}},
-        where: {trackAndTraceCode: ttc}});
-        if (!bestelling) {
-          debugLog("geen bestelling gevonden met TTC: " + ttc);
-          return "Verificatie";
-        }
-        return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
-    
-    
+        notification: false,
+      },
+      select: {
+        transportdienst: {
+          naam: true,
+          trackAndTraceFormat: { verificatiecodestring: true },
+        },
+      },
+      where: { trackAndTraceCode: ttc },
+    });
+    if (!bestelling) {
+      debugLog("geen bestelling gevonden met TTC: " + ttc);
+      return "Verificatie";
+    }
+    return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
   } catch (error: any) {
     return "Verificatie";
   }
-  
 };
 
 const checkBestellingExists = async (bestellingId: number) => {
@@ -448,16 +452,16 @@ const postBestelling = async (ctx: Koa.Context) => {
 
     // either all or none of the database operations should succeed
     // https://orkhan.gitbook.io/typeorm/docs/transactions#using-queryrunner-to-create-and-control-state-of-single-database-connection
-    const queryRunner = AppDataSource.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction()
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       // save bestelling and the linked besteldeProducten together (cascade)
       const savedBestelling = await bestellingRepository.save(bestelling);
 
-      
       debugLog(
-        "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
+        "postBestelling: savedBestelling with id: " +
+          savedBestelling.bestellingId
       );
 
       // update voorraad of bestelde producten
@@ -479,49 +483,66 @@ const postBestelling = async (ctx: Koa.Context) => {
         }
       }
 
-      const notification : Notification = new Notification();
+      const notification: Notification = new Notification();
       notification.aankoper = aankoper;
       notification.bestelling = bestelling;
 
-      notification.creationDate= new Date();
+      notification.creationDate = new Date();
       notification.isBekeken = false;
 
       debugLog(notification.creationDate);
-   
+
       notificationRepository.save(notification);
 
-      
-      
-
-
       // commit transaction now:
-      await queryRunner.commitTransaction()
-
+      await queryRunner.commitTransaction();
     } catch (error: any) {
       // since we have errors let's rollback changes we made
       await queryRunner.rollbackTransaction();
       throw new Error(error.message);
-
     } finally {
-        // you need to release query runner which is manually created:
-        await queryRunner.release()
+      // you need to release query runner which is manually created:
+      await queryRunner.release();
     }
 
-    return (ctx.status = 201), (ctx.body = {message: "Bestelling geplaatst met orderId " + bestelling.orderId + " bij bedrijf: " + leverancierBedrijf.naam});
+    return (
+      (ctx.status = 201),
+      (ctx.body = {
+        message:
+          "Bestelling geplaatst met orderId " +
+          bestelling.orderId +
+          " bij bedrijf: " +
+          leverancierBedrijf.naam,
+      })
+    );
   } catch (error: any) {
-    debugLog("postBestelling: error: " + error.message + ". Bestelling is NOT saved");
+    debugLog(
+      "postBestelling: error: " + error.message + ". Bestelling is NOT saved"
+    );
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
 
 const updateBestelling = async (ctx: Koa.Context) => {
   try {
+    const doosId = Number(ctx.query.doosId);
+    const straat = String(ctx.query.leveradresStraat);
+    const nummer = String(ctx.query.leveradresNummer);
+    const postcode = String(ctx.query.leveradresPostcode);
+    const stad = String(ctx.query.leveradresStad);
+    const land = String(ctx.query.leveradresLand);
 
-    const {
-      leveradres,
-      doosId
-    } = (ctx.request.body as {leveradres: {straat: string;nummer: string;stad: string;postcode: string;land:string;}, doosId: number});
-    
+    /*const { leveradres, doosId } = ctx.request.body as {
+      leveradres: {
+        straat: string;
+        nummer: string;
+        stad: string;
+        postcode: string;
+        land: string;
+      };
+      doosId: number;
+    };*/
+
     const bestellingId = ctx.params.id;
 
     if (bestellingId) {
@@ -544,7 +565,11 @@ const updateBestelling = async (ctx: Koa.Context) => {
       }
 
       if (bestelling.status !== BestellingStatus.GEPLAATST) {
-        debugLog("deze bestelling met Id: " + bestellingId + " kan niet gewijzigd worden");
+        debugLog(
+          "deze bestelling met Id: " +
+            bestellingId +
+            " kan niet gewijzigd worden"
+        );
         return (
           (ctx.status = 404),
           (ctx.body = { error: "Deze bestelling kan niet gewijzigd worden" })
@@ -564,24 +589,24 @@ const updateBestelling = async (ctx: Koa.Context) => {
         throw new Error("Doos bestaat niet");
       }
       // check if doos belongs to leverancierbedrijf
+
       if (doos.bedrijf.bedrijfId !== bestelling.leverancierBedrijf.bedrijfId) {
         debugLog("putBestelling: doos does not belong to leverancierbedrijf");
         throw new Error("Doos behoort niet tot leverancierbedrijf");
       }
 
-      bestelling.leveradresLand = leveradres.land;
-      bestelling.leveradresNummer = leveradres.nummer;
-      bestelling.leveradresPostcode = leveradres.postcode;
-      bestelling.leveradresStad = leveradres.stad;
-      bestelling.leveradresStraat= leveradres.straat;
+      bestelling.leveradresLand = land;
+      bestelling.leveradresNummer = nummer;
+      bestelling.leveradresPostcode = postcode;
+      bestelling.leveradresStad = stad;
+      bestelling.leveradresStraat = straat;
       bestelling.doos = doos;
 
       await bestellingRepository.save(bestelling);
       debugLog("bestelling geupdated");
-      ctx.status = 200;
-      return;
-
-      
+      return (
+        (ctx.status = 200), (ctx.body = { message: "Bestelling geupdated" })
+      );
     } else {
       return (
         (ctx.status = 400),
@@ -589,7 +614,9 @@ const updateBestelling = async (ctx: Koa.Context) => {
       );
     }
   } catch (error: any) {
-    debugLog("putBestelling: error: " + error.message + ". Bestelling is NOT updated");
+    debugLog(
+      "putBestelling: error: " + error.message + ". Bestelling is NOT updated"
+    );
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
