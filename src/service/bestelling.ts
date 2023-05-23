@@ -110,6 +110,7 @@ const getById = async (ctx: Koa.Context) => {
             product: {
               omschrijving: true,
               pictureFilename: true,
+              levertermijn: true,
             },
           },
         },
@@ -136,7 +137,9 @@ const getById = async (ctx: Koa.Context) => {
         return (sum += bp.subtotal);
       }, 0.0);
 
-      return { ...bestelling, status: BestellingStatus[bestelling.status] };
+      // return { ...bestelling, status: BestellingStatus[bestelling.status] };
+      const maxLevertermijn = Math.max(...bestelling.besteldeProducten.map((bp) => bp.product.levertermijn));
+      return { ...bestelling, status: BestellingStatus[bestelling.status], levertermijn: maxLevertermijn };
     } else {
       return (
         (ctx.status = 404),
@@ -165,6 +168,9 @@ const getByTrackAndTrace = async (ctx: any) => {
         transportdienst: {
           trackAndTraceFormat: true,
         },
+        besteldeProducten: {
+          product: true,
+        },
         notification: true,
       },
       select: {
@@ -173,6 +179,17 @@ const getByTrackAndTrace = async (ctx: any) => {
           trackAndTraceFormat: { verificatiecodestring: true },
         },
         notification: { creationDate: true },
+        besteldeProducten: {
+          id: true,
+          aantal: true,
+          naam: true,
+          eenheidsprijs: true,
+          product: {
+            omschrijving: true,
+            pictureFilename: true,
+            levertermijn: true,
+          },
+        },
       },
       where: { trackAndTraceCode: ttc },
     });
@@ -214,8 +231,8 @@ const getByTrackAndTrace = async (ctx: any) => {
           (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
         );
     }
-
-    return { ...bestelling, status: BestellingStatus[bestelling.status] };
+    const maxLevertermijn = Math.max(...bestelling.besteldeProducten.map((bp) => bp.product.levertermijn));
+    return { ...bestelling, status: BestellingStatus[bestelling.status], levertermijn: maxLevertermijn };
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
@@ -244,6 +261,12 @@ const getVerificatieByTrackAndTrace = async (ctx: any) => {
         transportdienst: {
           naam: true,
           trackAndTraceFormat: { verificatiecodestring: true },
+        },
+        besteldeProducten: {
+          id: true,
+          product: {
+            levertermijn: true,
+          },
         },
       },
       where: { trackAndTraceCode: ttc },
