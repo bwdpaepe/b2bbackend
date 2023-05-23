@@ -13,6 +13,7 @@ import { WinkelmandProducten } from "../entity/WinkelmandProducten";
 import { Product } from "../entity/Product";
 import { Notification } from "../entity/Notification";
 import { Timestamp } from "typeorm";
+import { string } from "zod";
 
 const debugLog = (message: any, meta = {}) => {
   logger.debug(message);
@@ -51,10 +52,12 @@ const getBestellingenVanBedrijf = async (ctx: Koa.Context) => {
           aankoper: true,
           transportdienst: false,
           notification: false,
+          doos: true,
         },
         select: {
-          leverancierBedrijf: { naam: true },
+          leverancierBedrijf: { naam: true, bedrijfId: true },
           aankoper: { firstname: true, lastname: true, email: true },
+          doos: { doosId: true, naam: true },
         },
         where: { klantBedrijf: { bedrijfId: bedrijfId } },
       });
@@ -87,12 +90,29 @@ const getById = async (ctx: Koa.Context) => {
           leverancierBedrijf: true,
           klantBedrijf: false,
           aankoper: true,
-          transportdienst: false,
-          notification: false,
+          transportdienst: true,
+          notification: true,
+          besteldeProducten: {
+            product: true,
+          },
+          doos: true,
         },
         select: {
-          leverancierBedrijf: { naam: true },
+          leverancierBedrijf: { bedrijfId: true, naam: true },
           aankoper: { firstname: true, lastname: true, email: true },
+          transportdienst: { naam: true },
+          notification: { creationDate: true },
+          besteldeProducten: {
+            id: true,
+            aantal: true,
+            naam: true,
+            eenheidsprijs: true,
+            product: {
+              omschrijving: true,
+              pictureFilename: true,
+              levertermijn: true,
+            },
+          },
         },
         where: { bestellingId: bestellingId },
       });
@@ -105,7 +125,21 @@ const getById = async (ctx: Koa.Context) => {
         );
       }
 
-      return { ...bestelling, status: BestellingStatus[bestelling.status] };
+      // Calculate the subtotal for each besteldProduct (aantal * eenheidsprijs)
+      if (bestelling && bestelling.besteldeProducten) {
+        bestelling.besteldeProducten.forEach((bp) => {
+          bp.subtotal = bp.aantal * bp.eenheidsprijs;
+        });
+      }
+
+      // Calculate the total price for each bedrijfId and store it in an array 'totalPrice'
+      bestelling.totalPrice = bestelling.besteldeProducten.reduce((sum, bp) => {
+        return (sum += bp.subtotal);
+      }, 0.0);
+
+      // return { ...bestelling, status: BestellingStatus[bestelling.status] };
+      const maxLevertermijn = Math.max(...bestelling.besteldeProducten.map((bp) => bp.product.levertermijn));
+      return { ...bestelling, status: BestellingStatus[bestelling.status], levertermijn: maxLevertermijn };
     } else {
       return (
         (ctx.status = 404),
@@ -134,6 +168,9 @@ const getByTrackAndTrace = async (ctx: any) => {
         transportdienst: {
           trackAndTraceFormat: true,
         },
+        besteldeProducten: {
+          product: true,
+        },
         notification: true,
       },
       select: {
@@ -142,6 +179,17 @@ const getByTrackAndTrace = async (ctx: any) => {
           trackAndTraceFormat: { verificatiecodestring: true },
         },
         notification: { creationDate: true },
+        besteldeProducten: {
+          id: true,
+          aantal: true,
+          naam: true,
+          eenheidsprijs: true,
+          product: {
+            omschrijving: true,
+            pictureFilename: true,
+            levertermijn: true,
+          },
+        },
       },
       where: { trackAndTraceCode: ttc },
     });
@@ -183,8 +231,8 @@ const getByTrackAndTrace = async (ctx: any) => {
           (ctx.body = { error: "Deze bestelling kan niet weergegeven worden" })
         );
     }
-
-    return { ...bestelling, status: BestellingStatus[bestelling.status] };
+    const maxLevertermijn = Math.max(...bestelling.besteldeProducten.map((bp) => bp.product.levertermijn));
+    return { ...bestelling, status: BestellingStatus[bestelling.status], levertermijn: maxLevertermijn };
   } catch (error: any) {
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
@@ -198,31 +246,39 @@ const getVerificatieByTrackAndTrace = async (ctx: any) => {
   }
 
   debugLog("ophalen verificatie bestelling met TTC " + ttc);
-  try{
-    
-      const bestelling: Bestelling = await bestellingRepository.findOne({
-        relations: {
-          leverancierBedrijf: false,
-          klantBedrijf: false,
-          aankoper: false,
-          transportdienst: {
-            trackAndTraceFormat: true,
-          },
-          notification: false,
+  try {
+    const bestelling: Bestelling = await bestellingRepository.findOne({
+      relations: {
+        leverancierBedrijf: false,
+        klantBedrijf: false,
+        aankoper: false,
+        transportdienst: {
+          trackAndTraceFormat: true,
         },
-        select: {transportdienst : {naam: true, trackAndTraceFormat : {verificatiecodestring: true}}},
-        where: {trackAndTraceCode: ttc}});
-        if (!bestelling) {
-          debugLog("geen bestelling gevonden met TTC: " + ttc);
-          return "Verificatie";
-        }
-        return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
-    
-    
+        notification: false,
+      },
+      select: {
+        transportdienst: {
+          naam: true,
+          trackAndTraceFormat: { verificatiecodestring: true },
+        },
+        besteldeProducten: {
+          id: true,
+          product: {
+            levertermijn: true,
+          },
+        },
+      },
+      where: { trackAndTraceCode: ttc },
+    });
+    if (!bestelling) {
+      debugLog("geen bestelling gevonden met TTC: " + ttc);
+      return "Verificatie";
+    }
+    return bestelling.transportdienst.trackAndTraceFormat.verificatiecodestring;
   } catch (error: any) {
     return "Verificatie";
   }
-  
 };
 
 const checkBestellingExists = async (bestellingId: number) => {
@@ -419,16 +475,16 @@ const postBestelling = async (ctx: Koa.Context) => {
 
     // either all or none of the database operations should succeed
     // https://orkhan.gitbook.io/typeorm/docs/transactions#using-queryrunner-to-create-and-control-state-of-single-database-connection
-    const queryRunner = AppDataSource.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction()
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       // save bestelling and the linked besteldeProducten together (cascade)
       const savedBestelling = await bestellingRepository.save(bestelling);
 
-      
       debugLog(
-        "postBestelling: savedBestelling with id: " + savedBestelling.bestellingId
+        "postBestelling: savedBestelling with id: " +
+          savedBestelling.bestellingId
       );
 
       // update voorraad of bestelde producten
@@ -450,37 +506,140 @@ const postBestelling = async (ctx: Koa.Context) => {
         }
       }
 
-      const notification : Notification = new Notification();
+      const notification: Notification = new Notification();
       notification.aankoper = aankoper;
       notification.bestelling = bestelling;
 
-      notification.creationDate= new Date();
+      notification.creationDate = new Date();
       notification.isBekeken = false;
 
       debugLog(notification.creationDate);
-   
+
       notificationRepository.save(notification);
 
-      
-      
-
-
       // commit transaction now:
-      await queryRunner.commitTransaction()
-
+      await queryRunner.commitTransaction();
     } catch (error: any) {
       // since we have errors let's rollback changes we made
       await queryRunner.rollbackTransaction();
       throw new Error(error.message);
-
     } finally {
-        // you need to release query runner which is manually created:
-        await queryRunner.release()
+      // you need to release query runner which is manually created:
+      await queryRunner.release();
     }
 
-    return (ctx.status = 201), (ctx.body = {message: "Bestelling geplaatst met orderId " + bestelling.orderId + " bij bedrijf: " + leverancierBedrijf.naam});
+    return (
+      (ctx.status = 201),
+      (ctx.body = {
+        message:
+          "Bestelling geplaatst met orderId " +
+          bestelling.orderId +
+          " bij bedrijf: " +
+          leverancierBedrijf.naam,
+      })
+    );
   } catch (error: any) {
-    debugLog("postBestelling: error: " + error.message + ". Bestelling is NOT saved");
+    debugLog(
+      "postBestelling: error: " + error.message + ". Bestelling is NOT saved"
+    );
+    return (ctx.status = 400), (ctx.body = { error: error.message });
+  }
+};
+
+const updateBestelling = async (ctx: Koa.Context) => {
+  try {
+    const doosId = Number(ctx.query.doosId);
+    const straat = String(ctx.query.leveradresStraat);
+    const nummer = String(ctx.query.leveradresNummer);
+    const postcode = String(ctx.query.leveradresPostcode);
+    const stad = String(ctx.query.leveradresStad);
+    const land = String(ctx.query.leveradresLand);
+
+    /*const { leveradres, doosId } = ctx.request.body as {
+      leveradres: {
+        straat: string;
+        nummer: string;
+        stad: string;
+        postcode: string;
+        land: string;
+      };
+      doosId: number;
+    };*/
+
+    const bestellingId = ctx.params.id;
+
+    if (bestellingId) {
+      const bestelling: Bestelling = await bestellingRepository.findOne({
+        relations: {
+          leverancierBedrijf: true,
+          doos: true,
+        },
+        where: { bestellingId: bestellingId },
+      });
+
+      console.log(bestelling);
+
+      if (!bestelling) {
+        debugLog("geen bestelling gevonden met Id: " + bestellingId);
+        return (
+          (ctx.status = 404),
+          (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+        );
+      }
+
+      if (bestelling.status !== BestellingStatus.GEPLAATST) {
+        debugLog(
+          "deze bestelling met Id: " +
+            bestellingId +
+            " kan niet gewijzigd worden"
+        );
+        return (
+          (ctx.status = 404),
+          (ctx.body = { error: "Deze bestelling kan niet gewijzigd worden" })
+        );
+      }
+
+      // fetch doos from database
+      const doos = await doosRepository.findOne({
+        where: {
+          doosId: doosId,
+        },
+        relations: ["bedrijf"],
+      });
+      // if doos does not exist, return error
+      if (!doos) {
+        debugLog("putBestelling: doos does not exist");
+        throw new Error("Doos bestaat niet");
+      }
+      // check if doos belongs to leverancierbedrijf
+
+      if (doos.bedrijf.bedrijfId !== bestelling.leverancierBedrijf.bedrijfId) {
+        debugLog("putBestelling: doos does not belong to leverancierbedrijf");
+        throw new Error("Doos behoort niet tot leverancierbedrijf");
+      }
+
+      bestelling.leveradresLand = land;
+      bestelling.leveradresNummer = nummer;
+      bestelling.leveradresPostcode = postcode;
+      bestelling.leveradresStad = stad;
+      bestelling.leveradresStraat = straat;
+      bestelling.doos = doos;
+
+      await bestellingRepository.save(bestelling);
+      debugLog("bestelling geupdated");
+      return (
+        (ctx.status = 200), (ctx.body = { message: "Bestelling geupdated" })
+      );
+    } else {
+      return (
+        (ctx.status = 400),
+        (ctx.body = { error: "Deze bestelling kan niet geupdated worden" })
+      );
+    }
+  } catch (error: any) {
+    debugLog(
+      "putBestelling: error: " + error.message + ". Bestelling is NOT updated"
+    );
     return (ctx.status = 400), (ctx.body = { error: error.message });
   }
 };
@@ -494,4 +653,5 @@ export default {
   checkBestellingExists,
   getBedrijfIdFromBestelling,
   postBestelling,
+  updateBestelling,
 };

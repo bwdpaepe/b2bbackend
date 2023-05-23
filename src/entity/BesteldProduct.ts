@@ -8,7 +8,7 @@ import {
 import { Bestelling } from "./Bestelling";
 import { Product } from "./Product";
 
-@Entity({ name: "besteldeproducten" })
+@Entity({ name: "BesteldeProducten" })
 export class BesteldProduct {
   @PrimaryGeneratedColumn({ name: "ID" })
   id: number;
@@ -29,4 +29,7 @@ export class BesteldProduct {
   @ManyToOne(() => Product, (product) => product.besteldeProducten)
   @JoinColumn({ name: "PRODUCT_ID" })
   product: Product;
+
+  // transient property subtotaal
+  subtotal: number;
 }

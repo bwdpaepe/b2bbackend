@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { Bestelling } from "./Bestelling";
 import { TrackAndTraceFormat } from "./TrackAndTraceFormat";
 
-@Entity({ name: "diensten"})
+@Entity({ name: "Diensten"})
 export class Transportdienst {
   @PrimaryGeneratedColumn({ name: "ID"})
   transportdienstId: number;

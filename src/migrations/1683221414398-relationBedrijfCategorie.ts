@@ -24,7 +24,7 @@ export class relationBedrijfCategorie1683221414398
           {
             columnNames: ["bedrijfId"],
             referencedColumnNames: ["ID"],
-            referencedTableName: "bedrijf",
+            referencedTableName: "BEDRIJF",
             onDelete: "CASCADE",
             onUpdate: "CASCADE",
           },
